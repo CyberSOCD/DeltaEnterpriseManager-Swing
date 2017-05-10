@@ -1,0 +1,16 @@
+.project
+.Logs/*
+*.log
+*.class
+*.lst
+pom.xml
+*.MF
+*.class
+*.prefs
+.settings/org.eclipse.jdt.core.prefs
+.settings/org.eclipse.jdt.core.prefs
+bin/ui/jFrames/InitialFrame.class
+*.class
+*.properties
+resources/users.properties
+resources/LoginDataActions.properties
