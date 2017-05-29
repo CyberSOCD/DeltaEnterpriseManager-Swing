@@ -66,29 +66,37 @@ public class EnvAccess {
 		try {
 			driver.setURL(this.conectionString, envParameter);
 			returnValue.setDriver(driver);
+			returnValue.setErrorCode(0);
 		} catch (UnknownHostException e) {
 			returnValue.setErrorMessage("El entorno al que intenta acceder no existe");
+			returnValue.setErrorCode(1);
 			e.printStackTrace();
 		} catch (HttpHostConnectException e) {
 			returnValue
 					.setErrorMessage("Se ha producido un error al conectarse al entorno");
 			e.printStackTrace();
+			returnValue.setErrorCode(2);
 		} catch (SocketTimeoutException e) {
 			returnValue
 					.setErrorMessage("Se ha producido un Timeout durante la conexion al entorno");
+			returnValue.setErrorCode(3);
 			e.printStackTrace();
 		} catch (FailingHttpStatusCodeException e) {
 			returnValue
 				.setErrorMessage("Se ha producido un error al conectarse al entorno");
 			returnValue.setErrorMessage(e.getMessage());
+			returnValue.setErrorCode(4);
 			e.printStackTrace();
 		} catch (MalformedURLException e) {
+			returnValue.setErrorCode(5);
 			e.printStackTrace();
 			throw e;
 		} catch (IOException e) {
+			returnValue.setErrorCode(6);
 			e.printStackTrace();
 			throw e;
 		} catch (Exception e) {
+			returnValue.setErrorCode(7);
 			e.printStackTrace();
 			throw e;
 		}

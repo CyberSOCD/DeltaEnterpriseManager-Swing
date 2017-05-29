@@ -7,6 +7,7 @@ public class ResultServlet {
 	private String errorMessage = "";
 	private long duration;
 	private WebClass driver;
+	private int errorCode = 0;
 
 	public long getDuration() {
 		return duration;
@@ -30,5 +31,13 @@ public class ResultServlet {
 
 	public void setErrorMessage(String errorMessage) {
 		this.errorMessage = errorMessage;
+	}
+
+	public int getErrorCode() {
+		return errorCode;
+	}
+
+	public void setErrorCode(int errorCode) {
+		this.errorCode = errorCode;
 	}
 }

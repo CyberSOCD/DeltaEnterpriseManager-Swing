@@ -30,14 +30,23 @@ public interface GenericStatus {
 	 */
 	public abstract int getCurrentStatus();
 	
-	public abstract void setCurrentStatus(int status);
-	
 	public abstract long getElapsedTime();
-	
-	public abstract void setElapsedTime(long elapsedTime);
 	
 	public abstract String getErrorMessage();
 	
+	public abstract Color getColor(int status);
+	
+	public abstract String getStateName();
+	
+	public abstract boolean finishValidation();
+	
+	public abstract void setElapsedTime(long elapsedTime);
+	
+	public abstract void setCurrentStatus(int status);
+	
 	public abstract void setErrorMessage(String message);
+	
+	public abstract long getFrequencyValidation();
+	
 	
 }

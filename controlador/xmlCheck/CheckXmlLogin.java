@@ -10,6 +10,7 @@ public class CheckXmlLogin {
 	public CheckXmlLogin(ResultServlet result){
 		xml = result.getDriver().getXmlPage();
 	}
+	
 	/**
 	 * Comprueba si no hay error en la respuesta del servidor
 	 */

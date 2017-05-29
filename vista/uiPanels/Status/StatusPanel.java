@@ -12,7 +12,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import uiThreads.TaskTimer;
+import uiRunnables.TaskTimer;
 import validationPackage.EnvStatusValidation;
 import common.UserConnectionData;
 import controlResult.EnvironmentStatus;

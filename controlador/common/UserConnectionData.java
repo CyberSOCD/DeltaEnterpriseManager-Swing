@@ -48,7 +48,7 @@ public class UserConnectionData {
 	public void setEnvName(String envName) {
 		this.envName = envName;
 	}
-	public String getDbHost() {
+	public String getDbURL() {
 		return dbHost;
 	}
 	public void setDbHost(String dbHost) {

@@ -40,7 +40,6 @@ public class HealthValidationTab extends GenericControlTab{
 	private JButton buttonClean;
 	
 	public HealthValidationTab(ArrayList<UserConnectionData> ListData, boolean isAM,boolean isMIN){
-//		setLayout(new GridBagLayout());
 		isMayoristas = isAM;
 		isMinoristas = isMIN;
 		data = ListData;
@@ -122,7 +121,6 @@ public class HealthValidationTab extends GenericControlTab{
 		validationsPanel = new JPanel();
 		validationsPanel.setLayout(new GridLayout(1,1));
 		validationsPanel.add(pan);
-//		validationsPanel.setBackground(new Color(22,235,247));
 		
 		buttonsPanel = new JPanel();
 		

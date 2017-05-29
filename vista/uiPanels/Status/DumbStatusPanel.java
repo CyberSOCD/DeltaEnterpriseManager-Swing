@@ -7,6 +7,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.net.MalformedURLException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
@@ -14,6 +16,8 @@ import javax.swing.JPanel;
 
 import common.UserConnectionData;
 import controlResult.GenericStatus;
+import uiRunnables.TaskTimer;
+import uiRunnables.ValidateTimer;
 import validationPackage.Validation;
 
 /**
@@ -29,12 +33,82 @@ public class DumbStatusPanel extends JPanel implements GenericStatusPanel{
 	private Validation validation;
 	private GenericStatus status;
 	private JPanel mainPanel;
+	private ValidateTimer timer = null;
+	private boolean testing = false;
+//	private boolean async = false;
+	private boolean first = true;
+	private long sleepTime;
 	
+//	public DumbStatusPanel(Validation validation, GenericStatus status, UserConnectionData data){
+//		this.data = data;
+//		this.validation = validation;
+//		this.status = status;
+//		initalize();
+//	}
+	/**
+	 * La validacion se realiza periodicamente hasta alcanzar un estado final
+	 * el tiempo en minutos viene por el parametro sleep
+	 * @param validation
+	 * @param status
+	 * @param data
+	 * @param sleep
+	 */
 	public DumbStatusPanel(Validation validation, GenericStatus status, UserConnectionData data){
 		this.data = data;
 		this.validation = validation;
 		this.status = status;
+		timer = new ValidateTimer(this,status.getFrequencyValidation());
+		sleepTime = status.getFrequencyValidation();
+//		async = true;
 		initalize();
+	}
+	
+	public boolean isTesting(){
+		return testing;
+	}
+	
+	/**
+	 * No se permite relanzar validación habiendo una en curso 
+	 * para evitar saturar las peticiones de validacion
+	 */
+	@Override
+	public void validateStatus() {
+		//En caso de que haya una prueba en vuelo no se vuelve a validar
+		if(!isTesting()){
+			testing = true;
+			first = true;
+			new Thread(timer).start();
+		}
+	}
+	
+	public void validateAsync(){
+		System.out.println("Entra en Async --- ");
+		if(first){
+			try {
+				validation.validate();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			first = false;
+		}
+		status = validation.getCurrentStatus();
+		updateComponents();
+		testing = !status.finishValidation();
+	}
+	
+	public void resetState(){
+		state.setText(GenericStatus.CURRENT_STATUS_PDT_STRING);
+		mainPanel.setBackground(GenericStatus.COLOR_STATUS_PDT);
+		for(Component c:mainPanel.getComponents()){
+			if(c instanceof JLabel){
+				mainPanel.remove(c);
+			}
+		}
+		mainPanel.add(state);
+	}
+	
+	public UserConnectionData getUserData(){
+		return data;
 	}
 	
 	private void initalize(){
@@ -56,66 +130,14 @@ public class DumbStatusPanel extends JPanel implements GenericStatusPanel{
 		this.add(mainPanel,BorderLayout.CENTER);
 	}
 	
-	@Override
-	public void validateStatus() {
-		try{
-			validation.validate();
-			status = validation.getCurrentStatus();
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		updateComponents();
-	}
-	
-	public void resetState(){
-		state.setText(GenericStatus.CURRENT_STATUS_PDT_STRING);
-		mainPanel.setBackground(GenericStatus.COLOR_STATUS_PDT);
-		for(Component c:mainPanel.getComponents()){
-			if(c instanceof JLabel){
-				mainPanel.remove(c);
-			}
-		}
-		mainPanel.add(state);
-	}
-	
-	public UserConnectionData getUserData(){
-		return data ;
-	}
-	
 	private void updateComponents(){
-		Color c;
-		String value;
-		switch(status.getCurrentStatus()){
-			case GenericStatus.CURRENT_STATUS_KO:
-				c = GenericStatus.COLOR_STATUS_KO;
-				value = GenericStatus.CURRENT_STATUS_KO_STRING;
-				break;
-			case GenericStatus.CURRENT_STATUS_OK:
-				c = GenericStatus.COLOR_STATUS_OK;
-				value = GenericStatus.CURRENT_STATUS_OK_STRING;
-				break;
-			case GenericStatus.CURRENT_STATUS_PDT:
-				c = GenericStatus.COLOR_STATUS_PDT;
-				value = GenericStatus.CURRENT_STATUS_PDT_STRING;
-				break;
-			case GenericStatus.CURRENT_STATUS_REV:
-				c = GenericStatus.COLOR_STATUS_REV;
-				value = GenericStatus.CURRENT_STATUS_REV_STRING;
-				break;
-			case GenericStatus.CURRENT_STATUS_UNKOWN:
-				c = GenericStatus.COLOR_STATUS_UNKW;
-				value = GenericStatus.CURRENT_STATUS_UNKOWN_STRING;
-				break;
-			default:
-				c = GenericStatus.COLOR_STATUS_UNKW;
-				value = GenericStatus.CURRENT_STATUS_UNKOWN_STRING;
-				break;
-		}
-		state.setText(value);
+		Color c = status.getColor(status.getCurrentStatus());
+		String statusName = status.getStateName();
+		state.setText(statusName);
 		checkErrorMessage();
 		mainPanel.setBackground(c);
+		validate();
+		repaint();
 	}
 	
 	/**
@@ -138,7 +160,7 @@ public class DumbStatusPanel extends JPanel implements GenericStatusPanel{
 	}
 	
 	private void setError(String message){
-		//Se dejan 4 palabras por label para evitar redimensionar
+		//Se dejan 5 palabras por label para evitar redimensionar
 		JLabel label;
 		int cont = 0;
 		String parcialMsg = "";
