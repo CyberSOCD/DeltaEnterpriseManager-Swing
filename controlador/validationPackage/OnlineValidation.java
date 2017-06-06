@@ -56,7 +56,6 @@ public class OnlineValidation extends Validation{
 			else
 				status.setErrorMessage(returnValue.getErrorMessage());
 		}
-		
 	}
 
 	@Override

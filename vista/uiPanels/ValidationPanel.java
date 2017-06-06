@@ -1,6 +1,7 @@
 package uiPanels;
 
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
@@ -30,7 +31,8 @@ public class ValidationPanel extends JPanel{
 	}
 	
 	private void initialize(){
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+//		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		setLayout(new GridLayout(statusList.size()+1,1));
 //		setBorder(BorderFactory.createTitledBorder(name));
 		panelHeader = new JPanel();
 		valHeader = new JLabel(name);

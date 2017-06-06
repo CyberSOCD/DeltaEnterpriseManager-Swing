@@ -17,6 +17,8 @@ import javax.swing.JPasswordField;
 
 import uiFrames.InitialFrame;
 import uiPanels.LoginPanel;
+import uiProfiles.ProfileControl;
+import uiProfiles.ProfileConstants;
 import common.UserConnectionData;
 import drivers.WebClass;
 import fileAccess.LoadFile;
@@ -28,25 +30,31 @@ import fuentes.EnvironmentData;
  * 
  */
 @SuppressWarnings("serial")
-public class ProfileFrame extends JFrame{
+public class LoginFrame extends JFrame{
 	private LoginPanel loginPanel;
+	private JComboBox<String> systemCombo;
 	private JComboBox<String> profileCombo;
 	private JPasswordField passwordText;
 	private JButton cancelButton;
 	private JButton loginButton;
 	private final String passAM = "saturno";
 	private final String passMIN = "pacifico";
-	private final String profMIN = "Minorista";
-	private final String profAM = "Mayorista";
-	private final String profAdm = "Administrador";
-	private String profile = profMIN;
+	private final String sysMIN = "Minorista";
+	private final String sysAM = "Mayorista";
+	private final String sysAdm = "Administrador";
+	private final String profileGestion = ProfileConstants.gestion;
+	private final String profileCerti = ProfileConstants.certi;
+	private final String profileDesa = ProfileConstants.desa;
+//	private String profile = "Gestion";
+	private String system = sysMIN;
 	private boolean login = false;
 	private boolean AM = false;
 	private boolean MIN = false;
+	private ProfileControl profileControl;
 	
-	public ProfileFrame(){
+	public LoginFrame(){
 		setTitle("Delta Enterprise Manager");
-		setSize(400, 150);
+		setSize(400, 180);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setVisible(true);
@@ -55,7 +63,7 @@ public class ProfileFrame extends JFrame{
 		initialize();
 		loginPanel.loading();
 		//Se fuerza la carga inicial de un WebClass para evitar 
-		//que muestre tiempos incorrectos la validacion
+		//que muestre tiempos incorrectos en la validacion
 		try {
 			WebClass c = new WebClass();
 			c.setURL("http://localhost", "");
@@ -63,6 +71,7 @@ public class ProfileFrame extends JFrame{
 			
 		}
 		loginPanel.resume();
+		passwordText.requestFocus();
 	}
 	
 	private boolean isMinoristas(){
@@ -76,21 +85,30 @@ public class ProfileFrame extends JFrame{
 	 */
 	private void initialize() {
 		loginPanel = new LoginPanel();
-		profileCombo = loginPanel.getProfileCheck();
-		profileCombo.addItemListener(new ItemListener(){
+		systemCombo = loginPanel.getSystemCheck();
+		systemCombo.addItemListener(new ItemListener(){
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				profile = profileCombo.getSelectedItem().toString();
+				system = systemCombo.getSelectedItem().toString();
 			}
 		});
-		profileCombo.setSelectedItem(profMIN);
+		systemCombo.setSelectedItem(sysMIN);
+		
+		profileCombo = loginPanel.getProfileCheck();
+//		profileCombo.addItemListener(new ItemListener(){
+//			@Override
+//			public void itemStateChanged(ItemEvent e) {
+//				profile = profileCombo.getSelectedItem().toString();
+//			}
+//		});
+		profileCombo.setSelectedItem(profileGestion);
 		
 		passwordText = loginPanel.getPassword();
 		passwordText.addKeyListener(new KeyListener() {
 			@Override
 			public void keyTyped(KeyEvent e) {
 				if(e.getKeyCode()==KeyEvent.VK_ENTER){
-					validateProfile();
+					validateSystem();
 				}else if(e.getKeyCode()==KeyEvent.VK_ESCAPE){
 					login = false;
 					dispose();
@@ -101,7 +119,7 @@ public class ProfileFrame extends JFrame{
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if(e.getKeyCode()==KeyEvent.VK_ENTER){
-					validateProfile();
+					validateSystem();
 				}else if(e.getKeyCode()==KeyEvent.VK_ESCAPE){
 					login = false;
 					dispose();
@@ -131,7 +149,7 @@ public class ProfileFrame extends JFrame{
 			public void mouseReleased(MouseEvent e) {}
 			@Override
 			public void mousePressed(MouseEvent e) {
-				validateProfile();
+				validateSystem();
 			}
 			@Override
 			public void mouseExited(MouseEvent e) {}
@@ -140,32 +158,31 @@ public class ProfileFrame extends JFrame{
 			@Override
 			public void mouseClicked(MouseEvent e) {}
 		});
-		
 		profileCombo.setVisible(true);
+		systemCombo.setVisible(true);
 		passwordText.setVisible(true);
 		loginButton.setVisible(true);
 		cancelButton.setVisible(true);
 		add(loginPanel);
 		validate();
 		repaint();
-		passwordText.requestFocus();
 	}
 	
-	private void validateProfile(){
+	private void validateSystem(){
 		boolean loginOk = true;
-		if(profile.equals(profAM)){
+		if(system.equals(sysAM)){
 			if(!parsePassword(passwordText.getPassword()).isEmpty()
 					&& parsePassword(passwordText.getPassword()).equals(passAM)){
 				AM = true;
 			}else
 				loginOk = false;
-		}else if(profile.equals(profMIN)){
+		}else if(system.equals(sysMIN)){
 			if(!parsePassword(passwordText.getPassword()).isEmpty()
 					&& parsePassword(passwordText.getPassword()).equals(passMIN)){
 				MIN = true;
 			}else
 				loginOk = false;
-		}else if(profile.equals(profAdm)){
+		}else if(system.equals(sysAdm)){
 			if(!parsePassword(passwordText.getPassword()).isEmpty() 
 					&& parsePassword(passwordText.getPassword()).equals("AdminGcDEM")){
 				AM = true;
@@ -202,11 +219,13 @@ public class ProfileFrame extends JFrame{
 				UserConnectionData userData = new UserConnectionData(user, pass,
 						envName, dns, num);
 				userData.setDbHost(dataBase);
+				userData.setEnvKey(data.getEnvKey(nombre));
 				listEnv.add(userData);
 				num++;
 			}
+			profileControl = new ProfileControl((String) profileCombo.getSelectedItem(), listEnv);
 			InitialFrame frame = new InitialFrame(listEnv, 
-					this.isMayoristas(), this.isMinoristas());
+					this.isMayoristas(), this.isMinoristas(),profileControl);
 			frame.getTitle();
 		}
 	}

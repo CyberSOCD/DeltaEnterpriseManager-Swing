@@ -1,5 +1,6 @@
 package uiPanels;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.GridLayout;
@@ -7,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
@@ -23,6 +25,7 @@ import controlResult.OfflineStatus;
 import controlResult.OnlineStatus;
 import uiCheckBox.CooldownCheckBox;
 import uiPanels.Status.DumbStatusPanel;
+import uiProfiles.ProfileControl;
 import validationPackage.BatchValidation;
 import validationPackage.EnvStatusValidation;
 import validationPackage.OfflineValidation;
@@ -35,6 +38,8 @@ import validationPackage.OnlineValidation;
  */
 @SuppressWarnings("serial")
 public class HealthComponentsPanel extends JPanel{
+	private ProfileControl profile;
+	
 	private final int loginPos = 0;
 	private final int onlinePos = 1;
 	private final int offlinePos = 2;
@@ -45,7 +50,6 @@ public class HealthComponentsPanel extends JPanel{
 //	private boolean isMinoristas;
 	private boolean globalChange = false;
 	private HashMap<CooldownCheckBox,DumbStatusPanel[]> relation;
-//	private JPanel EnvironmentPanel;
 	
 	private JPanel checkBoxPanel;
 	private JCheckBox checkBoxHeader;
@@ -65,14 +69,14 @@ public class HealthComponentsPanel extends JPanel{
 	//Lista de Validadores
 	private ArrayList<DumbStatusPanel> batchList;
 	
-	private long waitTime = 0;
 	public final long loginFreq = 500;
 	public final long onlineFreq = 500;
 	public final long offlineFreq = 5000;
 	public final long batchFreq = 500;
 	
-	public HealthComponentsPanel(ArrayList<UserConnectionData> envList, boolean isAM, boolean isMin){
+	public HealthComponentsPanel(ArrayList<UserConnectionData> envList, boolean isAM, boolean isMin, ProfileControl profile){
 		this.setOpaque(false);
+		this.profile = profile;
 		isMayoristas = isAM;
 //		isMinoristas = isMin;
 		relation = new HashMap<CooldownCheckBox, DumbStatusPanel[]>();
@@ -111,11 +115,13 @@ public class HealthComponentsPanel extends JPanel{
 		loading();
 		for(CooldownCheckBox c:validationList){
 			if(c.isSelected()){
+				if(!c.isVisible())
+					continue;
 				relation.get(c)[loginPos].validateStatus();
 				relation.get(c)[onlinePos].validateStatus();
 				relation.get(c)[offlinePos].validateStatus();
 //				relation.get(c)[batchPos].validateStatus();
-//				c.activate();
+				c.activate(relation);
 			}
 		}
 		resume();
@@ -156,7 +162,6 @@ public class HealthComponentsPanel extends JPanel{
 	}
 	
 	private void initialize(){
-		
 		loginList = new ArrayList<DumbStatusPanel>();
 		onlineList = new ArrayList<DumbStatusPanel>();
 		offlineList = new ArrayList<DumbStatusPanel>();
@@ -164,10 +169,9 @@ public class HealthComponentsPanel extends JPanel{
 		validationList = new ArrayList<CooldownCheckBox>();
 		//Recorre entornos correspondientes y crea los CheckBox
 		checkBoxPanel = new JPanel();
-//		checkBoxPanel.setBorder(BorderFactory.createRaisedBevelBorder());
 		checkBoxPanel.setLayout(new BoxLayout(checkBoxPanel, BoxLayout.Y_AXIS));
 		JPanel container = new JPanel();
-		container.setLayout(new GridLayout(data.size(),1));
+		container.setLayout(new GridLayout(data.size(),1,1, 30));
 		container.setOpaque(false);
 		mainPanel = new JPanel();
 		mainPanel.setOpaque(false);
@@ -175,10 +179,11 @@ public class HealthComponentsPanel extends JPanel{
 		add(mainPanel);
 		mainPanel.setLayout(new GridLayout(1, 3, 5, 5));
 		checkBoxHeader = new JCheckBox();
-		UserConnectionDataComparator comparator = new UserConnectionDataComparator();
+		checkBoxHeader.setBorder(BorderFactory.createEmptyBorder(20, 20, 50, 1));
+		UserConnectionDataComparator comparator = new UserConnectionDataComparator(profile);
 		Collections.sort(data, comparator);
 		for(UserConnectionData d:data){
-			CooldownCheckBox c = new CooldownCheckBox(waitTime);
+			CooldownCheckBox c = new CooldownCheckBox(profile.getHealthValidationTimeout());
 			c.setText(d.getEnvName());
 			c.setOpaque(false);
 			container.add(c);
@@ -192,7 +197,7 @@ public class HealthComponentsPanel extends JPanel{
 			//Panel Offline
 			DumbStatusPanel offlinePanel = new DumbStatusPanel(new OfflineValidation(d), new OfflineStatus(), d);
 			offlineList.add(offlinePanel);
-			
+			//Panel Batch
 			DumbStatusPanel batchPanel = new DumbStatusPanel(new BatchValidation(d), new BatchStatus(), d);
 			batchList.add(batchPanel);
 			DumbStatusPanel[] arr = new DumbStatusPanel[4];
@@ -201,6 +206,7 @@ public class HealthComponentsPanel extends JPanel{
 			arr[offlinePos] = offlinePanel;
 			arr[batchPos] = batchPanel;
 			relation.put(c, arr);
+			c.setVisible(d.isProfile());
 		}
 		checkBoxHeader.setOpaque(false);
 		checkBoxHeader.addChangeListener(new ChangeListener() {

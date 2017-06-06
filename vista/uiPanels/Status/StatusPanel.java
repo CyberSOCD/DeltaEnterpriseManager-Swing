@@ -37,6 +37,7 @@ public class StatusPanel extends JPanel implements GenericStatusPanel{
 	private Thread thrd;
 	private boolean testing = true;
 	private JPanel centerPanel;
+	private boolean active = true;
 
 	public StatusPanel(UserConnectionData data, String name){
 		status = new EnvironmentStatus();
@@ -47,6 +48,12 @@ public class StatusPanel extends JPanel implements GenericStatusPanel{
 		thrd = new Thread(timer);
 		initialize();
 	}
+	
+	public void desactivatePanel(){
+		active = false;
+		setVisible(false);
+	}
+	
 	/**
 	 * Inicializa los componentes del panel
 	 */
@@ -102,12 +109,12 @@ public class StatusPanel extends JPanel implements GenericStatusPanel{
 		updateComponents();
 		centerPanel.add(labelName);
 		centerPanel.add(labelVersion);
-		centerPanel.setVisible(true);
+//		centerPanel.setVisible(true);
 		
 		add(centerPanel,BorderLayout.CENTER);
 		add(timerVersion,BorderLayout.EAST);
 		setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
-		setVisible(true);
+//		setVisible(true);
 		setEnabled(true);
 	}
 	
@@ -136,6 +143,8 @@ public class StatusPanel extends JPanel implements GenericStatusPanel{
 	 * Realiza la validación contra el entorno
 	 */
 	public void validateStatus() {
+		if(!active)
+			return;
 		//Antes de validar cambia a gris para indicar que se está trabajando sobre el entorno
 		updateColor(EnvironmentStatus.COLOR_STATUS_PDT);
 		try {
@@ -161,6 +170,8 @@ public class StatusPanel extends JPanel implements GenericStatusPanel{
 	}
 	
 	public void stopValidation(){
+		if(!active)
+			return;
 		testing = false;
 		timerVersion.setText("- min");
 		thrd.interrupt();
@@ -169,6 +180,8 @@ public class StatusPanel extends JPanel implements GenericStatusPanel{
 	}
 	
 	public void startValidation(){
+		if(!active)
+			return;
 		testing = true;
 		timer = new TaskTimer(this, freqTimeout);
 		timer.setTime(freqTimeout);
@@ -185,6 +198,8 @@ public class StatusPanel extends JPanel implements GenericStatusPanel{
 	 * Realiza una actualización
 	 */
 	private void updateComponents() {
+		if(!active)
+			return;
 		updateColor(status.getStatusColor());
 		labelVersion.setText(serverVersion);
 		labelVersion.setVisible(!serverVersion.isEmpty());
@@ -206,6 +221,14 @@ public class StatusPanel extends JPanel implements GenericStatusPanel{
 	private void updateColor(Color c){
 		this.color = c;
 		repaint();
+	}
+	
+	public void setVisible(boolean visible){
+		System.out.println("Se cambia visibilidad a " + visible);
+		super.setVisible(visible);
+		labelName.setVisible(visible);
+		labelVersion.setVisible(visible);
+		timerVersion.setVisible(visible);
 	}
 
 	/**

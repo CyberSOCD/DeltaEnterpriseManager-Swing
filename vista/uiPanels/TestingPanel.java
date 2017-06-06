@@ -9,12 +9,14 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import common.UserConnectionData;
+import uiProfiles.ProfileControl;
 import uiTabs.GenericControlTab;
 import uiTabs.HealthValidationTab;
 
 @SuppressWarnings("serial")
 public class TestingPanel extends JPanel {
 
+	private ProfileControl profile;
 	private JTabbedPane genericPanel;
 	private GenericControlTab validacionEntornos;
 
@@ -24,9 +26,10 @@ public class TestingPanel extends JPanel {
 	 * @param isAM
 	 * @param isMIN
 	 */
-	public TestingPanel(ArrayList<UserConnectionData> ListData, boolean isAM,boolean isMIN) {
+	public TestingPanel(ArrayList<UserConnectionData> ListData, boolean isAM,boolean isMIN, ProfileControl profile) {
+		this.profile = profile;
 		setLayout(new GridLayout(1, 1));
-		validacionEntornos = new HealthValidationTab(ListData,isAM,isMIN);
+		validacionEntornos = new HealthValidationTab(ListData,isAM,isMIN,profile);
 		initialize();
 	}
 

@@ -9,11 +9,13 @@ public class UserConnectionData {
 	private String user;
 	private String password;
 	private String envName;
+	private String envKey;
 	private String dnsAccess;
 	private String dbHost;
 	private String dbUser;
 	private String dbPassword;
 	private int num;
+	private boolean profile;
 	
 	public UserConnectionData(String user, String password, String envName,String dnsAccess, int num){
 		this.user = user;
@@ -66,5 +68,16 @@ public class UserConnectionData {
 	public void setDbPassword(String dbPassword) {
 		this.dbPassword = dbPassword;
 	}
-	
+	public String getEnvKey() {
+		return envKey;
+	}
+	public void setEnvKey(String envKey) {
+		this.envKey = envKey;
+	}
+	public boolean isProfile() {
+		return profile;
+	}
+	public void setProfile(boolean profile) {
+		this.profile = profile;
+	}
 }

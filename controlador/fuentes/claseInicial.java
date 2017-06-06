@@ -2,12 +2,12 @@ package fuentes;
 
 
 //import uiDialog.ProfileDialog;
-import uiFrames.ProfileFrame;
+import uiFrames.LoginFrame;
 
 public class claseInicial {
 	public static void main(String[] args) throws Exception {
 //		ProfileDialog profileControl = new ProfileDialog();
-		ProfileFrame profileControl = new ProfileFrame();
+		LoginFrame profileControl = new LoginFrame();
 		profileControl.getTitle();
 	}
 }

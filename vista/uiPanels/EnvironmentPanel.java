@@ -15,16 +15,18 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
 import uiPanels.Status.StatusPanel;
+import uiProfiles.ProfileControl;
 import common.UserConnectionData;
 import common.UserConnectionDataComparator;
 
 /**
  * 
- * Panel que muestra todos los entornos y permite comprobar su estado  
+ * Panel que muestra todos los entornos y permite comprobar su estado
  *
  */
 public class EnvironmentPanel extends JPanel{
 	
+	private ProfileControl profile;
 	private static final long serialVersionUID = -7317025916951652718L;
 	private ArrayList<StatusPanel> envList = new ArrayList<StatusPanel>();
 	private JButton UpdateStatus;
@@ -37,8 +39,9 @@ public class EnvironmentPanel extends JPanel{
 	private boolean isMinoristas;
 	private boolean isMayoristas;
 	
-	public EnvironmentPanel(ArrayList<UserConnectionData> ListData, boolean isAm,boolean isMin){
+	public EnvironmentPanel(ArrayList<UserConnectionData> ListData, boolean isAm,boolean isMin, ProfileControl profile){
 		// Inicializa la lista de paneles de estado
+		this.profile = profile;
 		isMinoristas = isMin;
 		isMayoristas = isAm;
 		data = ListData;
@@ -52,23 +55,36 @@ public class EnvironmentPanel extends JPanel{
 	 * Inicializa todos los componentes
 	 */
 	private void initialize(){
-		UserConnectionDataComparator comparator = new UserConnectionDataComparator();
-		if(isMinoristas){
-			Collections.sort(data,comparator);
-			for(UserConnectionData info:data){
+		UserConnectionDataComparator comparator = new UserConnectionDataComparator(profile);
+		
+		Collections.sort(data,comparator);
+		for(UserConnectionData info:data){
+			if(isMinoristas && !isMayoristas){
 				if(!info.getEnvName().contains(" AM")){
-					envList.add(new StatusPanel(info,info.getEnvName()));
+					StatusPanel pan = new StatusPanel(info,info.getEnvName());
+					envList.add(pan);
+					if(!info.isProfile()){
+						pan.desactivatePanel();
+					}
 				}
-			}
-		}
-		if(isMayoristas){
-			Collections.sort(data,comparator);
-			for(UserConnectionData info:data){
+			}else if (!isMinoristas && isMayoristas){
 				if(info.getEnvName().contains(" AM")){
-					envList.add(new StatusPanel(info,info.getEnvName()));
+					StatusPanel pan = new StatusPanel(info,info.getEnvName());
+					envList.add(pan);
+					if(!info.isProfile()){
+						pan.desactivatePanel();
+					}
+				}
+			}else if(isMinoristas && isMayoristas){
+				StatusPanel pan = new StatusPanel(info,info.getEnvName());
+				envList.add(pan);
+				if(!info.isProfile()){
+					pan.desactivatePanel();
 				}
 			}
 		}
+		
+		
 		statusPanelContainer = new JPanel();
 		statusPanelContainer.setLayout(new GridLayout(envList.size(),1));
 		Minoristas = new JCheckBox();
@@ -125,7 +141,6 @@ public class EnvironmentPanel extends JPanel{
 		});
 		for(StatusPanel panel:envList){
 			statusPanelContainer.add(panel);
-			panel.setVisible(true);
 		}
 		this.setVisible(true);
 		add(statusPanelContainer,BorderLayout.CENTER);
@@ -135,32 +150,41 @@ public class EnvironmentPanel extends JPanel{
 	 * Actualiza los componentes del panel para que refresque los StatusPanel filtrados
 	 */
 	private void updateEnvironment(){
-		UserConnectionDataComparator comparator = new UserConnectionDataComparator();
+		UserConnectionDataComparator comparator = new UserConnectionDataComparator(profile);
 		for(StatusPanel panel:envList){
 			panel.stopValidation();
 			statusPanelContainer.remove(panel);
 		}
 		envList.clear();
-		if(Minoristas.isSelected()){
-			Collections.sort(data,comparator);
-			for(UserConnectionData info:data){
+		Collections.sort(data,comparator);
+		for(UserConnectionData info:data){
+			if(Minoristas.isSelected() && !Mayoristas.isSelected()){
 				if(!info.getEnvName().contains(" AM")){
-					envList.add(new StatusPanel(info,info.getEnvName()));
+					StatusPanel pan = new StatusPanel(info,info.getEnvName());
+					envList.add(pan);
+					if(!info.isProfile()){
+						pan.desactivatePanel();
+					}
 				}
-			}
-		}
-		if(Mayoristas.isSelected()){
-			Collections.sort(data,comparator);
-			for(UserConnectionData info:data){
+			}else if (!Minoristas.isSelected() && Mayoristas.isSelected()){
 				if(info.getEnvName().contains(" AM")){
-					envList.add(new StatusPanel(info,info.getEnvName()));
+					StatusPanel pan = new StatusPanel(info,info.getEnvName());
+					envList.add(pan);
+					if(!info.isProfile()){
+						pan.desactivatePanel();
+					}
+				}
+			}else if(Minoristas.isSelected() && Mayoristas.isSelected()){
+				StatusPanel pan = new StatusPanel(info,info.getEnvName());
+				envList.add(pan);
+				if(!info.isProfile()){
+					pan.desactivatePanel();
 				}
 			}
 		}
 		statusPanelContainer.setLayout(new GridLayout(envList.size(),1));
 		for(StatusPanel panel:envList){
 			statusPanelContainer.add(panel);
-			panel.setVisible(true);
 		}
 		validate();
 		repaint();

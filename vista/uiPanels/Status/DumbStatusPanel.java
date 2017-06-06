@@ -37,7 +37,6 @@ public class DumbStatusPanel extends JPanel implements GenericStatusPanel{
 	private boolean testing = false;
 //	private boolean async = false;
 	private boolean first = true;
-	private long sleepTime;
 	
 //	public DumbStatusPanel(Validation validation, GenericStatus status, UserConnectionData data){
 //		this.data = data;
@@ -58,8 +57,6 @@ public class DumbStatusPanel extends JPanel implements GenericStatusPanel{
 		this.validation = validation;
 		this.status = status;
 		timer = new ValidateTimer(this,status.getFrequencyValidation());
-		sleepTime = status.getFrequencyValidation();
-//		async = true;
 		initalize();
 	}
 	
@@ -82,7 +79,6 @@ public class DumbStatusPanel extends JPanel implements GenericStatusPanel{
 	}
 	
 	public void validateAsync(){
-		System.out.println("Entra en Async --- ");
 		if(first){
 			try {
 				validation.validate();
@@ -128,6 +124,7 @@ public class DumbStatusPanel extends JPanel implements GenericStatusPanel{
 		mainPanel.setAlignmentY(CENTER_ALIGNMENT);
 		this.setBackground(Color.LIGHT_GRAY);
 		this.add(mainPanel,BorderLayout.CENTER);
+		setVisible(data.isProfile());
 	}
 	
 	private void updateComponents(){

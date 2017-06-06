@@ -1,7 +1,10 @@
 package uiCheckBox;
 
+import java.util.HashMap;
+
 import javax.swing.JCheckBox;
 
+import uiPanels.Status.DumbStatusPanel;
 import uiRunnables.CheckBoxTimer;
 
 @SuppressWarnings("serial")
@@ -21,12 +24,15 @@ public class CooldownCheckBox extends JCheckBox{
 	}
 	
 	/**
-	 * Se des selecciona el componente e inhabilita por el tiempo definido 
+	 * Se des selecciona el componente e inhabilita por el tiempo definido
+	 * pudiendose incrementar hasta que finalicen todas las validaciones
+	 * pendientes
 	 */
-	public void activate(){
+	public void activate(HashMap<CooldownCheckBox,DumbStatusPanel[]> relation){
 		this.setSelected(false);
 		this.setEnabled(false);
-		CheckBoxTimer c = new CheckBoxTimer(this, time);
-		new Thread(c,"Hilo Huerfano").start();
+		CheckBoxTimer c = new CheckBoxTimer(this, time, relation.get(this));
+		new Thread(c).start();
+		
 	}
 }

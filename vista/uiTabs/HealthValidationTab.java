@@ -13,6 +13,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import uiPanels.HealthComponentsPanel;
+import uiProfiles.ProfileControl;
 import common.UserConnectionData;
 
 /**
@@ -22,6 +23,7 @@ import common.UserConnectionData;
  */
 @SuppressWarnings("serial")
 public class HealthValidationTab extends GenericControlTab{
+	private ProfileControl profile;
 	private boolean isMayoristas;
 	private boolean isMinoristas;
 	private boolean isAdmin = false;
@@ -39,7 +41,8 @@ public class HealthValidationTab extends GenericControlTab{
 	private JButton buttonValidate;
 	private JButton buttonClean;
 	
-	public HealthValidationTab(ArrayList<UserConnectionData> ListData, boolean isAM,boolean isMIN){
+	public HealthValidationTab(ArrayList<UserConnectionData> ListData, boolean isAM,boolean isMIN,ProfileControl profile){
+		this.profile = profile;
 		isMayoristas = isAM;
 		isMinoristas = isMIN;
 		data = ListData;
@@ -66,7 +69,7 @@ public class HealthValidationTab extends GenericControlTab{
 		panelMayorista = new JPanel();
 		panelMayorista.setBorder(BorderFactory.createRaisedBevelBorder());
 		panelActive = panelMinorista;
-		pan = new HealthComponentsPanel(getList(), isMayoristas,isMinoristas);
+		pan = new HealthComponentsPanel(getList(), isMayoristas,isMinoristas, profile);
 		if(isAdmin){
 		panelMayorista.addMouseListener(new MouseListener() {
 			@Override
