@@ -42,10 +42,6 @@ public class LoginFrame extends JFrame{
 	private final String sysMIN = "Minorista";
 	private final String sysAM = "Mayorista";
 	private final String sysAdm = "Administrador";
-	private final String profileGestion = ProfileConstants.gestion;
-	private final String profileCerti = ProfileConstants.certi;
-	private final String profileDesa = ProfileConstants.desa;
-//	private String profile = "Gestion";
 	private String system = sysMIN;
 	private boolean login = false;
 	private boolean AM = false;
@@ -101,9 +97,26 @@ public class LoginFrame extends JFrame{
 //				profile = profileCombo.getSelectedItem().toString();
 //			}
 //		});
-		profileCombo.setSelectedItem(profileGestion);
+		profileCombo.setSelectedItem(ProfileConstants.gestion);
 		
 		passwordText = loginPanel.getPassword();
+		this.addKeyListener(new KeyListener() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+			}
+			@Override
+			public void keyReleased(KeyEvent e) {
+			}
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if(e.getKeyCode()==KeyEvent.VK_ESCAPE){
+					login = false;
+					dispose();
+				}else if(e.getKeyCode()==KeyEvent.VK_ENTER){
+					validateSystem();
+				}
+			}
+		});
 		passwordText.addKeyListener(new KeyListener() {
 			@Override
 			public void keyTyped(KeyEvent e) {

@@ -19,6 +19,7 @@ public class UserConnectionDataComparator implements Comparator<UserConnectionDa
 	
 	@Override
 	public int compare(UserConnectionData o1, UserConnectionData o2) {
+		profile.checkEnvironment(o2);
 		int compareResult = 0;
 		if((o1.isProfile() && o2.isProfile()) || (o1.isProfile() && o2.isProfile()))
 			compareResult = o1.getNum() < o2.getNum() ? -1:1;

@@ -40,7 +40,7 @@ public class OfflineValidation extends Validation{
 			status.setCurrentStatusServer(1);
 			status.setErrorMessage(returnValue.getErrorMessage());
 		}else{
-			System.out.println("No entra en el error " + returnValue);
+//			System.out.println("No entra en el error " + returnValue);
 			//Recuperar de la respuesta la idProcess
 			CheckXmlOffline check = new CheckXmlOffline(returnValue);
 			idProcces = check.getIdProccess();

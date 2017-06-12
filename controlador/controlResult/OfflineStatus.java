@@ -28,8 +28,8 @@ public class OfflineStatus implements GenericStatus{
 	public final static String CURRENT_STATUS_OFF_STARTED_STRING = "Iniciada";
 	public final static String CURRENT_STATUS_OFF_QUEUED_KO_STRING = "No procesa las tareas";
 	
-	public final static Color COLOR_STATUS_OFF_QUEUED = GenericStatus.COLOR_STATUS_PDT;
-	public final static Color COLOR_STATUS_OFF_RUNNING = GenericStatus.COLOR_STATUS_PDT;
+	public final static Color COLOR_STATUS_OFF_QUEUED = new Color(199,221,241);
+	public final static Color COLOR_STATUS_OFF_RUNNING = COLOR_STATUS_OFF_QUEUED;
 	public final static Color COLOR_STATUS_OFF_INTERRUPTED = GenericStatus.COLOR_STATUS_KO;
 	public final static Color COLOR_STATUS_OFF_PAUSED = GenericStatus.COLOR_STATUS_PDT;
 	public final static Color COLOR_STATUS_OFF_ENDED_OK = GenericStatus.COLOR_STATUS_OK;
@@ -37,7 +37,7 @@ public class OfflineStatus implements GenericStatus{
 	public final static Color COLOR_STATUS_OFF_ENDED_ABR_USR = GenericStatus.COLOR_STATUS_KO;
 	public final static Color COLOR_STATUS_OFF_ENDED_TIMEOUT = GenericStatus.COLOR_STATUS_KO;
 	public final static Color COLOR_STATUS_OFF_SCHEDULED = GenericStatus.COLOR_STATUS_PDT;
-	public final static Color COLOR_STATUS_OFF_STARTED = GenericStatus.COLOR_STATUS_PDT;
+	public final static Color COLOR_STATUS_OFF_STARTED = COLOR_STATUS_OFF_QUEUED;
 	public final static Color COLOR_STATUS_OFF_QUEUED_KO = GenericStatus.COLOR_STATUS_KO;
 	
 	private int currentStatus;

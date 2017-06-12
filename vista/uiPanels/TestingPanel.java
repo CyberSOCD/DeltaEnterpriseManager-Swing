@@ -5,8 +5,6 @@ import java.util.ArrayList;
 
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import common.UserConnectionData;
 import uiProfiles.ProfileControl;
@@ -19,6 +17,8 @@ public class TestingPanel extends JPanel {
 	private ProfileControl profile;
 	private JTabbedPane genericPanel;
 	private GenericControlTab validacionEntornos;
+//	private GenericControlTab validacionSatelitales;
+	private static final int validationIndexTab = 0;
 
 	/**
 	 * 
@@ -29,8 +29,14 @@ public class TestingPanel extends JPanel {
 	public TestingPanel(ArrayList<UserConnectionData> ListData, boolean isAM,boolean isMIN, ProfileControl profile) {
 		this.profile = profile;
 		setLayout(new GridLayout(1, 1));
-		validacionEntornos = new HealthValidationTab(ListData,isAM,isMIN,profile);
+		validacionEntornos = new HealthValidationTab(ListData,isAM,isMIN,this.profile);
+//		validacionSatelitales = new HealthValidationTab(ListData, isAM, isMIN, profile);
 		initialize();
+	}
+	
+	public void selectValidation(){
+		genericPanel.setVisible(true);
+		genericPanel.setSelectedIndex(validationIndexTab);
 	}
 
 	/**
@@ -40,13 +46,10 @@ public class TestingPanel extends JPanel {
 
 		genericPanel = new JTabbedPane();
 		genericPanel.addTab("Validación entornos", validacionEntornos);
+//		genericPanel.addTab("Validación satelitales", validacionSatelitales);
 		add(genericPanel);
 		
-		genericPanel.setSelectedIndex(-1);
+		genericPanel.setVisible(false);
 		
-	}
-	
-	private void loadTab(GenericControlTab tab){
-		tab.loadComponent();
 	}
 }

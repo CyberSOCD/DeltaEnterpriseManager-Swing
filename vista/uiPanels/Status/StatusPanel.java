@@ -38,8 +38,10 @@ public class StatusPanel extends JPanel implements GenericStatusPanel{
 	private boolean testing = true;
 	private JPanel centerPanel;
 	private boolean active = true;
+	private boolean isAdmin;
 
-	public StatusPanel(UserConnectionData data, String name){
+	public StatusPanel(UserConnectionData data, String name, boolean isAdmin){
+		this.isAdmin = isAdmin;
 		status = new EnvironmentStatus();
 		this.envName = name;
 		updateColor(Color.GRAY);
@@ -52,6 +54,10 @@ public class StatusPanel extends JPanel implements GenericStatusPanel{
 	public void desactivatePanel(){
 		active = false;
 		setVisible(false);
+	}
+	
+	public void setAdmin(boolean isAdmin){
+		
 	}
 	
 	/**
@@ -67,7 +73,10 @@ public class StatusPanel extends JPanel implements GenericStatusPanel{
 		labelName = new JLabel();
 		labelName.setForeground(Color.black);
 		labelName.setText(envName);
-		labelName.setFont(new Font("Arial", Font.BOLD, 16));
+		if(isAdmin)
+			labelName.setFont(new Font("Arial", Font.BOLD, 14));
+		else
+			labelName.setFont(new Font("Arial", Font.BOLD, 16));
 		labelName.setAlignmentX(CENTER_ALIGNMENT);
 		labelName.setAlignmentY(BOTTOM_ALIGNMENT);
 		

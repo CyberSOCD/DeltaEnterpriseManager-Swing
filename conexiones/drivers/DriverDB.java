@@ -21,7 +21,7 @@ public class DriverDB {
 		//Crea la conexion
 		connection = null;
 		try {
-			System.out.println(URLConection + host);
+//			System.out.println(URLConection + host);
 			connection = DriverManager.getConnection(URLConection + host, "DELTA_MNTO_USR", "deltamntousr");
 		} catch (SQLException e) {
 			System.out.println("Connection Failed! Check output console");

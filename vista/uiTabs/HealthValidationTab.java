@@ -117,9 +117,10 @@ public class HealthValidationTab extends GenericControlTab{
 		labelMin.setAlignmentY(CENTER_ALIGNMENT);
 		labelAM.setAlignmentX(CENTER_ALIGNMENT);
 		labelAM.setAlignmentY(CENTER_ALIGNMENT);
-		
-		profilePanel.add(panelMinorista);
-		profilePanel.add(panelMayorista);
+		if(isMinoristas)
+			profilePanel.add(panelMinorista);
+		if(isMayoristas || isAdmin)
+			profilePanel.add(panelMayorista);
 		
 		validationsPanel = new JPanel();
 		validationsPanel.setLayout(new GridLayout(1,1));

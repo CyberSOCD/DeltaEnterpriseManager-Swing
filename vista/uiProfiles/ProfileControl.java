@@ -10,7 +10,7 @@ import common.UserConnectionData;
  * con la aplicacion
  *
  */
-public class ProfileControl {
+public final class ProfileControl {
 	private ArrayList<String> list;
 	private ArrayList<UserConnectionData> listEnv;
 	private String selectedProfile;
@@ -63,10 +63,10 @@ public class ProfileControl {
 			list = ProfileConstants.GESTION_ENVIRONMENT_KEY;
 			healthValidationTimeout = ProfileConstants.GESTION_HEALTH_TMEOUT;
 			break;
-		case ProfileConstants.desa:
-			list = ProfileConstants.DESARROLLO_ENVIRONMENT_KEY;
-			healthValidationTimeout = ProfileConstants.DESARROLLO_HEALTH_TMEOUT;
-			break;
+//		case ProfileConstants.desa:
+//			list = ProfileConstants.DESARROLLO_ENVIRONMENT_KEY;
+//			healthValidationTimeout = ProfileConstants.DESARROLLO_HEALTH_TMEOUT;
+//			break;
 		default:
 			list = ProfileConstants.GESTION_ENVIRONMENT_KEY;
 		}

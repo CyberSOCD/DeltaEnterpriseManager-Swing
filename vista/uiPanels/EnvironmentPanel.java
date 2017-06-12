@@ -14,6 +14,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
+import uiFrames.InitialFrame;
 import uiPanels.Status.StatusPanel;
 import uiProfiles.ProfileControl;
 import common.UserConnectionData;
@@ -38,13 +39,17 @@ public class EnvironmentPanel extends JPanel{
 	private boolean isTesting = true;
 	private boolean isMinoristas;
 	private boolean isMayoristas;
+	private boolean isAdmin;
+	private InitialFrame parent;
 	
-	public EnvironmentPanel(ArrayList<UserConnectionData> ListData, boolean isAm,boolean isMin, ProfileControl profile){
+	public EnvironmentPanel(ArrayList<UserConnectionData> ListData, boolean isAm,boolean isMin, ProfileControl profile, InitialFrame parent){
 		// Inicializa la lista de paneles de estado
+		this.parent = parent; 
 		this.profile = profile;
 		isMinoristas = isMin;
 		isMayoristas = isAm;
 		data = ListData;
+		isAdmin = isMin && isAm;
 		setLayout(new BorderLayout());
 		initialize();
 		for(StatusPanel p:envList){
@@ -61,7 +66,7 @@ public class EnvironmentPanel extends JPanel{
 		for(UserConnectionData info:data){
 			if(isMinoristas && !isMayoristas){
 				if(!info.getEnvName().contains(" AM")){
-					StatusPanel pan = new StatusPanel(info,info.getEnvName());
+					StatusPanel pan = new StatusPanel(info,info.getEnvName(), isAdmin);
 					envList.add(pan);
 					if(!info.isProfile()){
 						pan.desactivatePanel();
@@ -69,21 +74,20 @@ public class EnvironmentPanel extends JPanel{
 				}
 			}else if (!isMinoristas && isMayoristas){
 				if(info.getEnvName().contains(" AM")){
-					StatusPanel pan = new StatusPanel(info,info.getEnvName());
+					StatusPanel pan = new StatusPanel(info,info.getEnvName(), isAdmin);
 					envList.add(pan);
 					if(!info.isProfile()){
 						pan.desactivatePanel();
 					}
 				}
 			}else if(isMinoristas && isMayoristas){
-				StatusPanel pan = new StatusPanel(info,info.getEnvName());
+				StatusPanel pan = new StatusPanel(info,info.getEnvName(), isAdmin);
 				envList.add(pan);
 				if(!info.isProfile()){
 					pan.desactivatePanel();
 				}
 			}
 		}
-		
 		
 		statusPanelContainer = new JPanel();
 		statusPanelContainer.setLayout(new GridLayout(envList.size(),1));
@@ -110,6 +114,9 @@ public class EnvironmentPanel extends JPanel{
 		if(isMayoristas && isMinoristas){
 			Mayoristas.setEnabled(true);
 			Minoristas.setEnabled(true);
+		}else{
+			Mayoristas.setVisible(isMayoristas);
+			Minoristas.setVisible(isMinoristas);
 		}
 		
 		filter = new FilterEnvironmentPanel(Minoristas, Mayoristas);
@@ -125,11 +132,9 @@ public class EnvironmentPanel extends JPanel{
 				if(isTesting()){
 					isTesting = false;
 					stopValidation();
-					UpdateStatus.setText("Reanudar validación");
 				}else{
 					resumeValidation();
 					isTesting = true;
-					UpdateStatus.setText("Parar validación");
 				}
 			}
 			@Override
@@ -160,7 +165,7 @@ public class EnvironmentPanel extends JPanel{
 		for(UserConnectionData info:data){
 			if(Minoristas.isSelected() && !Mayoristas.isSelected()){
 				if(!info.getEnvName().contains(" AM")){
-					StatusPanel pan = new StatusPanel(info,info.getEnvName());
+					StatusPanel pan = new StatusPanel(info,info.getEnvName(), isAdmin);
 					envList.add(pan);
 					if(!info.isProfile()){
 						pan.desactivatePanel();
@@ -168,14 +173,14 @@ public class EnvironmentPanel extends JPanel{
 				}
 			}else if (!Minoristas.isSelected() && Mayoristas.isSelected()){
 				if(info.getEnvName().contains(" AM")){
-					StatusPanel pan = new StatusPanel(info,info.getEnvName());
+					StatusPanel pan = new StatusPanel(info,info.getEnvName(), isAdmin);
 					envList.add(pan);
 					if(!info.isProfile()){
 						pan.desactivatePanel();
 					}
 				}
 			}else if(Minoristas.isSelected() && Mayoristas.isSelected()){
-				StatusPanel pan = new StatusPanel(info,info.getEnvName());
+				StatusPanel pan = new StatusPanel(info,info.getEnvName(), isAdmin);
 				envList.add(pan);
 				if(!info.isProfile()){
 					pan.desactivatePanel();
@@ -200,15 +205,19 @@ public class EnvironmentPanel extends JPanel{
 	public boolean isTesting(){
 		return this.isTesting;
 	}
-	private void stopValidation(){
+	public void stopValidation(){
+		UpdateStatus.setText("Reanudar validación");
 		for(StatusPanel panel:envList){
 			panel.stopValidation();
 		}
+		parent.stopValidationInf();
 	}
-	private void resumeValidation(){
+	public void resumeValidation(){
+		UpdateStatus.setText("Parar validación");
 		for(StatusPanel panel:envList){
 			if(!panel.isTesting())
 				panel.startValidation();
 		}
+		parent.resumeValidationInf();
 	}
 }

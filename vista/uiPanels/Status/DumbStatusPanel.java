@@ -5,10 +5,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.GridLayout;
-import java.net.MalformedURLException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
@@ -16,7 +12,6 @@ import javax.swing.JPanel;
 
 import common.UserConnectionData;
 import controlResult.GenericStatus;
-import uiRunnables.TaskTimer;
 import uiRunnables.ValidateTimer;
 import validationPackage.Validation;
 

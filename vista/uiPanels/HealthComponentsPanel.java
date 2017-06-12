@@ -1,6 +1,5 @@
 package uiPanels;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.GridLayout;
@@ -8,8 +7,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -169,9 +166,10 @@ public class HealthComponentsPanel extends JPanel{
 		validationList = new ArrayList<CooldownCheckBox>();
 		//Recorre entornos correspondientes y crea los CheckBox
 		checkBoxPanel = new JPanel();
-		checkBoxPanel.setLayout(new BoxLayout(checkBoxPanel, BoxLayout.Y_AXIS));
+//		checkBoxPanel.setLayout(new BoxLayout(checkBoxPanel, BoxLayout.Y_AXIS));
+		checkBoxPanel.setLayout(new GridLayout());
 		JPanel container = new JPanel();
-		container.setLayout(new GridLayout(data.size(),1,1, 30));
+		container.setLayout(new GridLayout(data.size()+1,1,1, 30));
 		container.setOpaque(false);
 		mainPanel = new JPanel();
 		mainPanel.setOpaque(false);
@@ -179,7 +177,8 @@ public class HealthComponentsPanel extends JPanel{
 		add(mainPanel);
 		mainPanel.setLayout(new GridLayout(1, 3, 5, 5));
 		checkBoxHeader = new JCheckBox();
-		checkBoxHeader.setBorder(BorderFactory.createEmptyBorder(20, 20, 50, 1));
+//		checkBoxHeader.setBorder(BorderFactory.createEmptyBorder(1, 20, 1, 1));
+		container.add(checkBoxHeader);
 		UserConnectionDataComparator comparator = new UserConnectionDataComparator(profile);
 		Collections.sort(data, comparator);
 		for(UserConnectionData d:data){
@@ -222,7 +221,7 @@ public class HealthComponentsPanel extends JPanel{
 			}
 		});
 		checkBoxHeader.setAlignmentX( Component.LEFT_ALIGNMENT );
-		checkBoxPanel.add(checkBoxHeader);
+//		checkBoxPanel.add(checkBoxHeader);
 		checkBoxPanel.add(container);
 		loginPanel = new ValidationPanel(loginList, "Login");
 		onlinePanel = new ValidationPanel(onlineList, "Online");

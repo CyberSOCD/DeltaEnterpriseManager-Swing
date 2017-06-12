@@ -21,7 +21,7 @@ public class LoginPanel extends JPanel{
 	private final String sysAdm = "Administrador";
 	private final String profileCerti = ProfileConstants.certi;
 	private final String profileGestion = ProfileConstants.gestion;
-	private final String profileDesa = ProfileConstants.desa;
+//	private final String profileDesa = ProfileConstants.desa;
 	//Contenedor principal
 	private JPanel mainContainer;
 
@@ -92,7 +92,7 @@ public class LoginPanel extends JPanel{
 		profileCombo = new JComboBox<String>();
 		profileCombo.addItem(profileCerti);
 		profileCombo.addItem(profileGestion);
-		profileCombo.addItem(profileDesa);
+//		profileCombo.addItem(profileDesa);
 		
 		passwordText = new JPasswordField(10);
 		
