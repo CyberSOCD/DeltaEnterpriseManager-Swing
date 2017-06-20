@@ -20,13 +20,17 @@ public class LogControl {
 
 	private UserConnectionData data;
 	private String file;
+	private String xlsFile;
 	private BufferedWriter buffWriter;
 	private final String connector =" - ";
+	private ExcelReporting excelLog;
 	
 	public LogControl(UserConnectionData data){
 		this.data = data;
 		try {
 			buffWriter = getLogWriter();
+			setFileXlsPath();
+			excelLog = new ExcelReporting(xlsFile);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -39,12 +43,19 @@ public class LogControl {
 	 */
 	public void logActivity(ResultServlet result, EnvironmentStatus status){
 		String lineLog = getCurrentTime();
+		String lineLogXls;
 		lineLog = lineLog + connector;
 		lineLog = lineLog + status.getParsedCurrentStatus(status.getCurrentStatus());
+		lineLogXls = lineLog;
 		if(status.getCurrentStatus()== EnvironmentStatus.CURRENT_STATUS_KO){
 			lineLog = lineLog + connector + status.getErrorMessage();
+			lineLogXls = lineLog;
+		}else{
+			lineLogXls = lineLogXls + connector + " ";
 		}
 		lineLog = lineLog + connector + "Tiempo de respuesta: " + status.getElapsedTime() + " milisegundos.";
+		lineLogXls = lineLogXls + connector + status.getElapsedTime();
+		excelLog.writeLine(lineLogXls);
 		try {
 			buffWriter = getLogWriter();
 			buffWriter.append(lineLog);
@@ -75,6 +86,13 @@ public class LogControl {
 	}
 	
 	/**
+	 * Escribe el log obtenido en el fichero
+	 */
+	public void stopValidation(){
+		excelLog.stopValidation();
+	}
+	
+	/**
 	 * Define la ruta del fichero donde se guardara la actividad
 	 */
 	private void setFilePath(){
@@ -82,6 +100,17 @@ public class LogControl {
 		file = System.getProperty("user.dir") + "/Logs/" + env;
 		new File(file).mkdirs();
 		file = file + "/" + env + ".log";
+	}
+	
+	/**
+	 * Define la ruta del fichero donde se guardara la actividad
+	 * en formato xslx
+	 */
+	private void setFileXlsPath(){
+		String env = data.getEnvName().replace(" ", "");
+		xlsFile = System.getProperty("user.dir") + "/Logs/" + env;
+		new File(xlsFile).mkdirs();
+		xlsFile = xlsFile + "/" + env + ".xls";
 	}
 	
 	/**

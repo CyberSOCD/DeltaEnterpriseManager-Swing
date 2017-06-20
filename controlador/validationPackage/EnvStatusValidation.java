@@ -99,6 +99,10 @@ public class EnvStatusValidation extends Validation{
 		return value.replace("Versión desplegada ", "");
 	}
 	
+	public void stopValidation(){
+		Log.stopValidation();
+	}
+	
 	public String getArqVersion(){
 		String value = "";
 		CheckXmlLogin check;

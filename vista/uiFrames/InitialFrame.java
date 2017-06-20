@@ -3,6 +3,7 @@ package uiFrames;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 
 import javax.swing.AbstractAction;
@@ -71,7 +72,13 @@ public class InitialFrame extends JFrame {
 		createMenu();
 		setJMenuBar(menuBar);
 		this.add(split);
+		this.addWindowListener(new java.awt.event.WindowAdapter() {
+	        public void windowClosing(WindowEvent winEvt) {
+	        	validationPanel.stopValidation();
+	        }
+		});
 	}
+	
 	
 	/**
 	 * Se añaden todas las opciones de menu necesarias el JMenuBar

@@ -32,7 +32,7 @@ public class StatusPanel extends JPanel implements GenericStatusPanel{
 	private JLabel labelVersion;
 	private JLabel timerVersion;
 	private String serverVersion = "";
-	private int freqTimeout = 5;
+	private int freqTimeout = 1;
 	private TaskTimer timer;
 	private Thread thrd;
 	private boolean testing = true;
@@ -186,6 +186,7 @@ public class StatusPanel extends JPanel implements GenericStatusPanel{
 		thrd.interrupt();
 		timer = null;
 		thrd = null;
+		validate.stopValidation();
 	}
 	
 	public void startValidation(){
@@ -233,7 +234,7 @@ public class StatusPanel extends JPanel implements GenericStatusPanel{
 	}
 	
 	public void setVisible(boolean visible){
-		System.out.println("Se cambia visibilidad a " + visible);
+//		System.out.println("Se cambia visibilidad a " + visible);
 		super.setVisible(visible);
 		labelName.setVisible(visible);
 		labelVersion.setVisible(visible);
