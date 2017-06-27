@@ -23,6 +23,10 @@ public final class ProfileControl {
 		setActiveEnvs();
 	}
 	
+	public boolean isAdmin(){
+		return selectedProfile.equals(ProfileConstants.ADMINISTRADOR);
+	}
+	
 	/**
 	 * Devuelve si el entorno pasado debe estar activo
 	 * @param keyEnv
@@ -32,6 +36,65 @@ public final class ProfileControl {
 		if(list.contains(keyEnv.getEnvKey()))
 			return true;
 		return false;
+	}
+	
+	public String getSelectedProfile() {
+		return selectedProfile;
+	}
+	
+	public long getHealthValidationTimeout() {
+		return healthValidationTimeout;
+	}
+	
+	public int getMinFreqValidationProfile(){
+		int value = 5;
+		switch(selectedProfile){
+			case ProfileConstants.CERTIFICACION_MIN:
+				value = 5;
+				break;
+			case ProfileConstants.GESTION_MIN:
+				value = 5;
+				break;
+			case ProfileConstants.GESTION_MAY:
+				value = 5;
+				break;
+			case ProfileConstants.ADMINISTRADOR:
+				value = 1;
+				break;
+			default:
+				value = 5;
+		}
+		return value;
+	}
+	
+	private ArrayList<String> getEnvNames(String profile){
+		ArrayList<String> list;
+//		System.out.println(profile);
+		switch(profile){
+		case ProfileConstants.CERTIFICACION_MIN:
+			list = ProfileConstants.CERTIFICACION_MIN_ENVIRONMENT_KEY;
+			healthValidationTimeout = ProfileConstants.CERTIFICACION_MIN_HEALTH_TMEOUT;
+			break;
+		case ProfileConstants.GESTION_MIN:
+			list = ProfileConstants.GESTION_MIN_ENVIRONMENT_KEY;
+			healthValidationTimeout = ProfileConstants.GESTION_MIN_HEALTH_TMEOUT;
+			break;
+		case ProfileConstants.GESTION_MAY:
+			list = ProfileConstants.GESTION_MAY_ENVIRONMENT_KEY;
+			healthValidationTimeout = ProfileConstants.GESTION_MAY_HEALTH_TMEOUT;
+			break;
+		case ProfileConstants.ADMINISTRADOR:
+			list = ProfileConstants.ADMIN_ENVIRONMENT_KEY;
+			healthValidationTimeout = ProfileConstants.ADMIN_HEALTH_TMEOUT;
+			break;
+		case ProfileConstants.DESA:
+			list = ProfileConstants.DESA_ENVIRONMENT_KEY;
+			healthValidationTimeout = ProfileConstants.ADMIN_HEALTH_TMEOUT;
+			break;
+		default:
+			list = ProfileConstants.GESTION_MIN_ENVIRONMENT_KEY;
+		}
+		return list;
 	}
 	
 	/**
@@ -44,36 +107,5 @@ public final class ProfileControl {
 			else
 				u.setProfile(true);
 		}
-	}
-	
-	public String getSelectedProfile() {
-		return selectedProfile;
-	}
-	
-	
-	
-	private ArrayList<String> getEnvNames(String profile){
-		ArrayList<String> list;
-		switch(profile){
-		case ProfileConstants.certi:
-			list = ProfileConstants.CERTIFICACION_ENVIRONMENT_KEY;
-			healthValidationTimeout = ProfileConstants.CERTIFICACION_HEALTH_TMEOUT;
-			break;
-		case ProfileConstants.gestion:
-			list = ProfileConstants.GESTION_ENVIRONMENT_KEY;
-			healthValidationTimeout = ProfileConstants.GESTION_HEALTH_TMEOUT;
-			break;
-//		case ProfileConstants.desa:
-//			list = ProfileConstants.DESARROLLO_ENVIRONMENT_KEY;
-//			healthValidationTimeout = ProfileConstants.DESARROLLO_HEALTH_TMEOUT;
-//			break;
-		default:
-			list = ProfileConstants.GESTION_ENVIRONMENT_KEY;
-		}
-		return list;
-	}
-
-	public long getHealthValidationTimeout() {
-		return healthValidationTimeout;
 	}
 }

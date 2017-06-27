@@ -24,9 +24,15 @@ public class LogControl {
 	private BufferedWriter buffWriter;
 	private final String connector =" - ";
 	private ExcelReporting excelLog;
+	private String currentDay;
 	
 	public LogControl(UserConnectionData data){
+		SimpleDateFormat date = new SimpleDateFormat("dd-MM-yyyy");
+        currentDay = date.format(Calendar.getInstance().getTime());
 		this.data = data;
+	}
+	
+	public void activeLog(){
 		try {
 			buffWriter = getLogWriter();
 			setFileXlsPath();
@@ -93,6 +99,18 @@ public class LogControl {
 	}
 	
 	/**
+	 * Escribe el log obtenido en el fichero
+	 */
+	public void resumeValidation(){
+		SimpleDateFormat date = new SimpleDateFormat("dd-MM-yyyy");
+		checkDate(date.format(Calendar.getInstance().getTime()));
+//		if(cont == 0)
+//			cont++;
+//		else
+//			excelLog.rotateFile("28-06-2017", "27-06-2017");
+	}
+	
+	/**
 	 * Define la ruta del fichero donde se guardara la actividad
 	 */
 	private void setFilePath(){
@@ -108,9 +126,10 @@ public class LogControl {
 	 */
 	private void setFileXlsPath(){
 		String env = data.getEnvName().replace(" ", "");
+//		env = env + "-";
 		xlsFile = System.getProperty("user.dir") + "/Logs/" + env;
 		new File(xlsFile).mkdirs();
-		xlsFile = xlsFile + "/" + env + ".xls";
+		xlsFile = xlsFile + "/" + env + "-" + currentDay + ".xls";
 	}
 	
 	/**
@@ -131,6 +150,19 @@ public class LogControl {
 	private String getCurrentTime(){
 		Calendar cal = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy-HH:mm:ss");
+        SimpleDateFormat date = new SimpleDateFormat("dd-MM-yyyy");
+        checkDate(date.format(cal.getTime()));
+        currentDay = date.format(cal.getTime());
         return sdf.format(cal.getTime());
-	}	
+	}
+	
+	/**
+	 * Comprueba si el dia de registro es igual al actual
+	 */
+	private void checkDate(String date){
+		if(!date.equals(currentDay)){
+			excelLog.rotateFile(date, currentDay);
+		}
+		currentDay = date;
+	}
 }

@@ -87,6 +87,10 @@ public class EnvStatusValidation extends Validation{
 		}
 	}
 	
+	public void activate(){
+		Log.activeLog();		
+	}
+	
 	public String getServerVersion() throws Exception{
 		String value = "";
 		EnvAccess env = new EnvAccess(data);
@@ -101,6 +105,10 @@ public class EnvStatusValidation extends Validation{
 	
 	public void stopValidation(){
 		Log.stopValidation();
+	}
+	
+	public void resumeValidation(){
+		Log.resumeValidation();
 	}
 	
 	public String getArqVersion(){

@@ -74,11 +74,12 @@ public class InitialFrame extends JFrame {
 		this.add(split);
 		this.addWindowListener(new java.awt.event.WindowAdapter() {
 	        public void windowClosing(WindowEvent winEvt) {
-	        	validationPanel.stopValidation();
+	        	if(validationPanel.isTesting()){
+	        		validationPanel.stopValidation();
+	        	}
 	        }
 		});
 	}
-	
 	
 	/**
 	 * Se añaden todas las opciones de menu necesarias el JMenuBar

@@ -39,7 +39,6 @@ public class EnvironmentPanel extends JPanel{
 	private boolean isTesting = true;
 	private boolean isMinoristas;
 	private boolean isMayoristas;
-	private boolean isAdmin;
 	private InitialFrame parent;
 	
 	public EnvironmentPanel(ArrayList<UserConnectionData> ListData, boolean isAm,boolean isMin, ProfileControl profile, InitialFrame parent){
@@ -49,7 +48,6 @@ public class EnvironmentPanel extends JPanel{
 		isMinoristas = isMin;
 		isMayoristas = isAm;
 		data = ListData;
-		isAdmin = isMin && isAm;
 		setLayout(new BorderLayout());
 		initialize();
 		for(StatusPanel p:envList){
@@ -61,12 +59,17 @@ public class EnvironmentPanel extends JPanel{
 	 */
 	private void initialize(){
 		UserConnectionDataComparator comparator = new UserConnectionDataComparator(profile);
-		
 		Collections.sort(data,comparator);
 		for(UserConnectionData info:data){
-			if(isMinoristas && !isMayoristas){
+			if(profile.isAdmin()){
+				StatusPanel pan = new StatusPanel(info,info.getEnvName(), profile);
+				envList.add(pan);
+				if(!info.isProfile()){
+					pan.desactivatePanel();
+				}
+			}else if(isMinoristas && !isMayoristas){
 				if(!info.getEnvName().contains(" AM")){
-					StatusPanel pan = new StatusPanel(info,info.getEnvName(), isAdmin);
+					StatusPanel pan = new StatusPanel(info,info.getEnvName(), profile);
 					envList.add(pan);
 					if(!info.isProfile()){
 						pan.desactivatePanel();
@@ -74,17 +77,11 @@ public class EnvironmentPanel extends JPanel{
 				}
 			}else if (!isMinoristas && isMayoristas){
 				if(info.getEnvName().contains(" AM")){
-					StatusPanel pan = new StatusPanel(info,info.getEnvName(), isAdmin);
+					StatusPanel pan = new StatusPanel(info,info.getEnvName(), profile);
 					envList.add(pan);
 					if(!info.isProfile()){
 						pan.desactivatePanel();
 					}
-				}
-			}else if(isMinoristas && isMayoristas){
-				StatusPanel pan = new StatusPanel(info,info.getEnvName(), isAdmin);
-				envList.add(pan);
-				if(!info.isProfile()){
-					pan.desactivatePanel();
 				}
 			}
 		}
@@ -93,7 +90,7 @@ public class EnvironmentPanel extends JPanel{
 		statusPanelContainer.setLayout(new GridLayout(envList.size(),1));
 		Minoristas = new JCheckBox();
 		Minoristas.setText("Minoristas");
-		Minoristas.setSelected(isMinoristas);
+		Minoristas.setSelected(isMinoristas||profile.isAdmin());
 		Minoristas.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -103,7 +100,7 @@ public class EnvironmentPanel extends JPanel{
 		Minoristas.setEnabled(false);
 		Mayoristas = new JCheckBox();
 		Mayoristas.setText("Mayoristas");
-		Mayoristas.setSelected(isMayoristas);
+		Mayoristas.setSelected(isMayoristas||profile.isAdmin());
 		Mayoristas.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -111,7 +108,8 @@ public class EnvironmentPanel extends JPanel{
 			}
 		});
 		Mayoristas.setEnabled(false);
-		if(isMayoristas && isMinoristas){
+//		System.out.println(profile.getSelectedProfile());
+		if(profile.isAdmin()){
 			Mayoristas.setEnabled(true);
 			Minoristas.setEnabled(true);
 		}else{
@@ -165,7 +163,7 @@ public class EnvironmentPanel extends JPanel{
 		for(UserConnectionData info:data){
 			if(Minoristas.isSelected() && !Mayoristas.isSelected()){
 				if(!info.getEnvName().contains(" AM")){
-					StatusPanel pan = new StatusPanel(info,info.getEnvName(), isAdmin);
+					StatusPanel pan = new StatusPanel(info,info.getEnvName(), profile);
 					envList.add(pan);
 					if(!info.isProfile()){
 						pan.desactivatePanel();
@@ -173,14 +171,14 @@ public class EnvironmentPanel extends JPanel{
 				}
 			}else if (!Minoristas.isSelected() && Mayoristas.isSelected()){
 				if(info.getEnvName().contains(" AM")){
-					StatusPanel pan = new StatusPanel(info,info.getEnvName(), isAdmin);
+					StatusPanel pan = new StatusPanel(info,info.getEnvName(), profile);
 					envList.add(pan);
 					if(!info.isProfile()){
 						pan.desactivatePanel();
 					}
 				}
 			}else if(Minoristas.isSelected() && Mayoristas.isSelected()){
-				StatusPanel pan = new StatusPanel(info,info.getEnvName(), isAdmin);
+				StatusPanel pan = new StatusPanel(info,info.getEnvName(), profile);
 				envList.add(pan);
 				if(!info.isProfile()){
 					pan.desactivatePanel();
@@ -216,7 +214,7 @@ public class EnvironmentPanel extends JPanel{
 		UpdateStatus.setText("Parar validación");
 		for(StatusPanel panel:envList){
 			if(!panel.isTesting())
-				panel.startValidation();
+				panel.resumeValidation();
 		}
 		parent.resumeValidationInf();
 	}

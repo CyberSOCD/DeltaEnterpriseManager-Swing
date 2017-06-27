@@ -26,7 +26,6 @@ public class HealthValidationTab extends GenericControlTab{
 	private ProfileControl profile;
 	private boolean isMayoristas;
 	private boolean isMinoristas;
-	private boolean isAdmin = false;
 	private ArrayList<UserConnectionData> data;
 	private JPanel mainPanel;
 	private JPanel validationsPanel;
@@ -46,11 +45,7 @@ public class HealthValidationTab extends GenericControlTab{
 		isMayoristas = isAM;
 		isMinoristas = isMIN;
 		data = ListData;
-		isAdmin = isAM && isMIN;
-		if(isAdmin){
-			isMayoristas = false;
-		}
-		initialize();
+ 		initialize();
 	}
 	
 	public void loadComponent() {
@@ -70,37 +65,37 @@ public class HealthValidationTab extends GenericControlTab{
 		panelMayorista.setBorder(BorderFactory.createRaisedBevelBorder());
 		panelActive = panelMinorista;
 		pan = new HealthComponentsPanel(getList(), isMayoristas,isMinoristas, profile);
-		if(isAdmin){
-		panelMayorista.addMouseListener(new MouseListener() {
-			@Override
-			public void mouseReleased(MouseEvent e) {}
-			@Override
-			public void mousePressed(MouseEvent e) {
-				changeSelected((JPanel) e.getSource());
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {}
-			@Override
-			public void mouseEntered(MouseEvent e) {}
-			@Override
-			public void mouseClicked(MouseEvent e) {}
-		});
-		panelMinorista.addMouseListener(new MouseListener() {
-			@Override
-			public void mouseReleased(MouseEvent e) {}
-			@Override
-			public void mousePressed(MouseEvent e) {
-				changeSelected((JPanel) e.getSource());
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {}
-			@Override
-			public void mouseEntered(MouseEvent e) {}
-			@Override
-			public void mouseClicked(MouseEvent e) {}
-		});
+		if(profile.isAdmin()){
+			panelMayorista.addMouseListener(new MouseListener() {
+				@Override
+				public void mouseReleased(MouseEvent e) {}
+				@Override
+				public void mousePressed(MouseEvent e) {
+					changeSelected((JPanel) e.getSource());
+				}
+				@Override
+				public void mouseExited(MouseEvent e) {}
+				@Override
+				public void mouseEntered(MouseEvent e) {}
+				@Override
+				public void mouseClicked(MouseEvent e) {}
+			});
+			panelMinorista.addMouseListener(new MouseListener() {
+				@Override
+				public void mouseReleased(MouseEvent e) {}
+				@Override
+				public void mousePressed(MouseEvent e) {
+					changeSelected((JPanel) e.getSource());
+				}
+				@Override
+				public void mouseExited(MouseEvent e) {}
+				@Override
+				public void mouseEntered(MouseEvent e) {}
+				@Override
+				public void mouseClicked(MouseEvent e) {}
+			});
 		}
-		if(isAdmin){
+		if(profile.isAdmin()){
 			//Si es administrador por defecto min
 			setSelected(panelMinorista);
 		}else if(isMayoristas){
@@ -119,7 +114,7 @@ public class HealthValidationTab extends GenericControlTab{
 		labelAM.setAlignmentY(CENTER_ALIGNMENT);
 		if(isMinoristas)
 			profilePanel.add(panelMinorista);
-		if(isMayoristas || isAdmin)
+		if(isMayoristas || profile.isAdmin())
 			profilePanel.add(panelMayorista);
 		
 		validationsPanel = new JPanel();
@@ -239,7 +234,7 @@ public class HealthValidationTab extends GenericControlTab{
 			isMIN = true;
 			isAM = false;
 		}
-		if(!isAdmin){
+		if(!profile.isAdmin()){
 			for(UserConnectionData d:data){
 				if(isMayoristas){
 					if(d.getEnvName().contains("AM")){

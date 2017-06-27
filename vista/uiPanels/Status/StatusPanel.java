@@ -12,6 +12,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import uiProfiles.ProfileControl;
 import uiRunnables.TaskTimer;
 import validationPackage.EnvStatusValidation;
 import common.UserConnectionData;
@@ -32,16 +33,16 @@ public class StatusPanel extends JPanel implements GenericStatusPanel{
 	private JLabel labelVersion;
 	private JLabel timerVersion;
 	private String serverVersion = "";
-	private int freqTimeout = 1;
+	private int freqTimeout = 5;
 	private TaskTimer timer;
 	private Thread thrd;
 	private boolean testing = true;
 	private JPanel centerPanel;
 	private boolean active = true;
-	private boolean isAdmin;
+	private ProfileControl profile;
 
-	public StatusPanel(UserConnectionData data, String name, boolean isAdmin){
-		this.isAdmin = isAdmin;
+	public StatusPanel(UserConnectionData data, String name, ProfileControl profile){
+		this.profile = profile;
 		status = new EnvironmentStatus();
 		this.envName = name;
 		updateColor(Color.GRAY);
@@ -73,7 +74,7 @@ public class StatusPanel extends JPanel implements GenericStatusPanel{
 		labelName = new JLabel();
 		labelName.setForeground(Color.black);
 		labelName.setText(envName);
-		if(isAdmin)
+		if(profile.isAdmin())
 			labelName.setFont(new Font("Arial", Font.BOLD, 14));
 		else
 			labelName.setFont(new Font("Arial", Font.BOLD, 16));
@@ -136,7 +137,7 @@ public class StatusPanel extends JPanel implements GenericStatusPanel{
 			}else
 				mod = 5;
 		}else{//Al reducir el tiempo
-			if(time == 1){
+			if(time == profile.getMinFreqValidationProfile()){
 				mod = 0;
 			}else if(time <= 5 ){
 				mod = -1;
@@ -144,7 +145,7 @@ public class StatusPanel extends JPanel implements GenericStatusPanel{
 				mod = -5;
 			}
 		}
-		System.out.println("Inc. " + mod);
+//		System.out.println("Inc. " + mod);
 		return mod;
 	}
 
@@ -189,7 +190,19 @@ public class StatusPanel extends JPanel implements GenericStatusPanel{
 		validate.stopValidation();
 	}
 	
-	public void startValidation(){
+	public void startValidation(){ 
+		if(!active)
+			return;
+		validate.activate();
+		testing = true;
+		timer = new TaskTimer(this, freqTimeout);
+		timer.setTime(freqTimeout);
+		thrd = new Thread(timer);
+		thrd.start();
+		timerVersion.setText(Integer.toString(freqTimeout) + " min");
+	}
+	
+	public void resumeValidation(){
 		if(!active)
 			return;
 		testing = true;
@@ -198,6 +211,7 @@ public class StatusPanel extends JPanel implements GenericStatusPanel{
 		thrd = new Thread(timer);
 		thrd.start();
 		timerVersion.setText(Integer.toString(freqTimeout) + " min");
+		validate.resumeValidation();
 	}
 	
 	public boolean isTesting(){

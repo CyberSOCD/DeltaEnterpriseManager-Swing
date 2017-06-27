@@ -48,15 +48,33 @@ public class ExcelReporting {
 	 * Escribe el workbook creado
 	 */
 	public void stopValidation(){
+//		try {
+//			FileOutputStream fileOut = new FileOutputStream(file);
+//			if(appendFile){
+//				in.close();
+//			}
+//			wb.write(fileOut);
+//			fileOut.close();
+//		}catch(IOException e){
+//			e.printStackTrace();
+//		}
+		saveFileInfo();
+	}
+	
+	/**
+	 * Metodo que hace rotar los excel generados, para evitar
+	 * un exceso en el uso de la memoria 
+	 */
+	public void rotateFile(String date, String oldDate){
+		//Guarda info actual en fichero anterior
+//		saveFileInfo();
+		//Actualiza fichero con nueva fecha
+//		System.out.println(file.replace(oldDate, date));
+		rowNumber = 1;
 		try {
-			FileOutputStream fileOut = new FileOutputStream(file);
-			if(appendFile){
-				System.out.println("Existe el xls :::::::: " + file);
-				in.close();
-			}
-			wb.write(fileOut);
-			fileOut.close();
-		}catch(IOException e){
+			initializeWorkbook(file.replace(oldDate, date));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -68,8 +86,7 @@ public class ExcelReporting {
 	private void initializeWorkbook(String file) throws IOException{
 		this.file = file;
 		if(new File(file).exists()){
-			System.out.println("Existe el xls :::::::: " + file);
-			//En caso de existir se carga el libro actual y asigna numero de file
+			//En caso de existir se carga el libro actual y asigna numero de fila
 			in = new FileInputStream(new File(file));
 			wb = new HSSFWorkbook(in);
 			sheet = wb.getSheet(sheetName);
@@ -83,6 +100,22 @@ public class ExcelReporting {
 			r.createCell(resultado).setCellValue("Estado");
 			r.createCell(error).setCellValue("Mensaje de Error");
 			r.createCell(tiempo).setCellValue("Tiempo respuesta del Servidor");
+		}
+	}
+	
+	/**
+	 * Guarda los datos almacenados en memoria 
+	 */
+	private void saveFileInfo(){
+		try {
+			FileOutputStream fileOut = new FileOutputStream(file);
+			if(appendFile){
+				in.close();
+			}
+			wb.write(fileOut);
+			fileOut.close();
+		}catch(IOException e){
+			e.printStackTrace();
 		}
 	}
 	

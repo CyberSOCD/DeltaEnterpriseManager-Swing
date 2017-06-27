@@ -9,12 +9,14 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 
+import security.SecurityClass;
 import uiFrames.InitialFrame;
 import uiPanels.LoginPanel;
 import uiProfiles.ProfileControl;
@@ -34,18 +36,16 @@ public class LoginFrame extends JFrame{
 	private LoginPanel loginPanel;
 	private JComboBox<String> systemCombo;
 	private JComboBox<String> profileCombo;
+	private DefaultComboBoxModel<String> profileModel;
 	private JPasswordField passwordText;
 	private JButton cancelButton;
 	private JButton loginButton;
-	private final String passAM = "saturno";
-	private final String passMIN = "pacifico";
 	private final String sysMIN = "Minorista";
 	private final String sysAM = "Mayorista";
-	private final String sysAdm = "Administrador";
 	private String system = sysMIN;
 	private boolean login = false;
 	private boolean AM = false;
-	private boolean MIN = false;
+	private boolean MIN = true;
 	private ProfileControl profileControl;
 	
 	public LoginFrame(){
@@ -86,18 +86,33 @@ public class LoginFrame extends JFrame{
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				system = systemCombo.getSelectedItem().toString();
+				updateProfileItems(system);
+				if(system.equals(sysMIN)){
+					MIN = true;
+					AM = false;
+				}else if(system.equals(sysAM)){
+					AM = true;
+					MIN = false;
+				}
 			}
 		});
 		systemCombo.setSelectedItem(sysMIN);
 		
 		profileCombo = loginPanel.getProfileCheck();
-//		profileCombo.addItemListener(new ItemListener(){
-//			@Override
-//			public void itemStateChanged(ItemEvent e) {
-//				profile = profileCombo.getSelectedItem().toString();
-//			}
-//		});
-		profileCombo.setSelectedItem(ProfileConstants.gestion);
+		profileCombo.addItemListener(new ItemListener(){
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if(profileCombo.getSelectedItem() == null)
+					return;
+				if (profileCombo.getSelectedItem().toString()
+						.equals(ProfileConstants.ADMINISTRADOR)) {
+					systemCombo.setEnabled(false);
+				}else{
+					systemCombo.setEnabled(true);
+				}
+			}
+		});
+		profileCombo.setSelectedItem(ProfileConstants.GESTION_MIN);
 		
 		passwordText = loginPanel.getPassword();
 		this.addKeyListener(new KeyListener() {
@@ -131,6 +146,9 @@ public class LoginFrame extends JFrame{
 			public void keyReleased(KeyEvent e) {}
 			@Override
 			public void keyPressed(KeyEvent e) {
+//				if(e.getKeyCode()==KeyEvent.VK_F1){
+//					loadFrame("Desa");
+//				}
 				if(e.getKeyCode()==KeyEvent.VK_ENTER){
 					validateSystem();
 				}else if(e.getKeyCode()==KeyEvent.VK_ESCAPE){
@@ -184,28 +202,32 @@ public class LoginFrame extends JFrame{
 	private void validateSystem(){
 		boolean loginOk = true;
 		if(system.equals(sysAM)){
-			if(!parsePassword(passwordText.getPassword()).isEmpty()
-					&& parsePassword(passwordText.getPassword()).equals(passAM)){
+			if(!passwordText.getPassword().toString().isEmpty()
+					&& passwordText.getPassword().toString().equals("saturno") && loginOk){
 				AM = true;
 			}else
 				loginOk = false;
 		}else if(system.equals(sysMIN)){
-			if(!parsePassword(passwordText.getPassword()).isEmpty()
-					&& parsePassword(passwordText.getPassword()).equals(passMIN)){
+			if(!passwordText.getPassword().toString().isEmpty()
+					&& passwordText.getPassword().toString().equals("pacifico")){
 				MIN = true;
 			}else
 				loginOk = false;
-		}else if(system.equals(sysAdm)){
-			if(!parsePassword(passwordText.getPassword()).isEmpty() 
-					&& parsePassword(passwordText.getPassword()).equals("AdminGcDEM")){
-				AM = true;
+		}else if(system.equals(sysMIN)){
+			if(!passwordText.getPassword().toString().isEmpty()
+					&& passwordText.getPassword().toString().equals("PassAdminis")){
 				MIN = true;
+				AM = true;
 			}else
 				loginOk = false;
 		}
-		if(!loginOk){
+		SecurityClass sec = new SecurityClass(systemCombo.getSelectedItem()
+				.toString(), profileCombo.getSelectedItem().toString(),
+				passwordText.getPassword());
+		if(!sec.validProfile(passwordText.getPassword())){
 			login = false;
 			JOptionPane.showMessageDialog(null, "La contraseña no es correcta");
+			passwordText.setText("");
 		}
 		else{
 			login = true;
@@ -242,6 +264,31 @@ public class LoginFrame extends JFrame{
 			frame.getTitle();
 		}
 	}
+	
+//	private void loadFrame(String Desa){
+//		this.setVisible(false);
+//		EnvironmentData data = new EnvironmentData();
+//		ArrayList<UserConnectionData> listEnv = new ArrayList<UserConnectionData>();
+//		int num = 0;
+//		for (String nombre : data.getNamesList()) {
+//			String user = getLoginInf(nombre, "USER");
+//			String pass = getLoginInf(nombre, "PASSWORD");
+//			String dns = data.getURL(nombre);
+//			String envName = data.getFormatName(nombre);
+//			String dataBase = data.getDatabase(nombre);
+//			UserConnectionData userData = new UserConnectionData(user, pass,
+//					envName, dns, num);
+//			userData.setDbHost(dataBase);
+//			userData.setEnvKey(data.getEnvKey(nombre));
+//			listEnv.add(userData);
+//			num++;
+//		}
+//		profileControl = new ProfileControl(Desa, listEnv);
+//		InitialFrame frame = new InitialFrame(listEnv, 
+//				this.isMayoristas(), this.isMinoristas(),profileControl);
+//		frame.getTitle();
+//	}
+	
 	private String getLoginInf(String environmentName, String type) {
 		LoadFile.class.getClass().getResource("/resources/EnvironmentList.properties");
 		ArrayList<String> testCases = LoadFile.getFile("/users.properties");
@@ -259,11 +306,22 @@ public class LoginFrame extends JFrame{
 		return returnValue;
 	}
 	
-	private String parsePassword(char[] array){
-		String pass = "";
-		for(char c:array){
-			pass = pass + c;
+	private void updateProfileItems(String system){
+		//Limpia items
+		profileModel = (DefaultComboBoxModel<String>) profileCombo.getModel();
+		profileModel.removeAllElements();
+		//Rellena items
+		if(systemCombo.getSelectedItem().toString().equals(sysMIN)){
+			profileModel.addElement(ProfileConstants.CERTIFICACION_MIN);
+			profileModel.addElement(ProfileConstants.GESTION_MIN);
+			profileModel.addElement(ProfileConstants.ADMINISTRADOR);
+//			profileModel.addElement(ProfileConstants.GESTION_MIN);
+		}else{
+			profileModel.addElement(ProfileConstants.GESTION_MAY);
+			profileModel.addElement(ProfileConstants.ADMINISTRADOR);
+//			profileCombo.setSelectedItem(ProfileConstants.GESTION_MAY);
 		}
-		return pass;
+		profileCombo.setModel(profileModel);
+//		profileModel = (DefaultComboBoxModel<String>) profileCombo.getModel();
 	}
 }
