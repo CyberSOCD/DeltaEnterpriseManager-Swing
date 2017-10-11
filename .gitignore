@@ -15,3 +15,4 @@ bin/ui/jFrames/InitialFrame.class
 *.properties
 resources/users.properties
 resources/LoginDataActions.properties
+*.classpath
