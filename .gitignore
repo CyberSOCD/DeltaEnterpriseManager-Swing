@@ -4,6 +4,7 @@
 *.class
 *.lst
 pom.xml
+*.xls
 *.MF
 *.class
 *.prefs
