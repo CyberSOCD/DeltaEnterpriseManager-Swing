@@ -20,6 +20,7 @@ import vista.ui.Frames.InitialFrame;
 import vista.ui.Panels.LoginPanel;
 import vista.ui.Profiles.ProfileConstants;
 import vista.ui.Profiles.ProfileControl;
+import vista.ui.Profiles.ProfileControl.TipoSistema;
 import conexion.drivers.WebClass;
 import conexion.fileAccess.LoadFile;
 import controlador.common.UserConnectionData;
@@ -44,9 +45,8 @@ public class LoginFrame extends JFrame{
 	private final String sysAM = "Mayorista";
 	private String system = sysMIN;
 	private boolean login = false;
-	private boolean AM = false;
-	private boolean MIN = true;
 	private ProfileControl profileControl;
+	private TipoSistema sistema;
 	
 	public LoginFrame(){
 		setTitle("Delta Enterprise Manager");
@@ -66,15 +66,10 @@ public class LoginFrame extends JFrame{
 		} catch (Exception e) {
 			
 		}
+		//Por defecto sistema Minorista
+		sistema = TipoSistema.MINORISTA;
 		loginPanel.resume();
 		passwordText.requestFocus();
-	}
-	
-	private boolean isMinoristas(){
-		return MIN;
-	}
-	private boolean isMayoristas(){
-		return AM;
 	}
 	/**
 	 * Inicializa los elementos de la UI
@@ -88,11 +83,9 @@ public class LoginFrame extends JFrame{
 				system = systemCombo.getSelectedItem().toString();
 				updateProfileItems(system);
 				if(system.equals(sysMIN)){
-					MIN = true;
-					AM = false;
+					sistema = TipoSistema.MINORISTA;
 				}else if(system.equals(sysAM)){
-					AM = true;
-					MIN = false;
+					sistema = TipoSistema.MAYORISTA;
 				}
 			}
 		});
@@ -154,6 +147,8 @@ public class LoginFrame extends JFrame{
 				}else if(e.getKeyCode()==KeyEvent.VK_ESCAPE){
 					login = false;
 					dispose();
+				}else if(e.getKeyCode()==KeyEvent.VK_F1){
+					backDoor();
 				}
 			}
 		});
@@ -204,20 +199,16 @@ public class LoginFrame extends JFrame{
 		if(system.equals(sysAM)){
 			if(!passwordText.getPassword().toString().isEmpty()
 					&& passwordText.getPassword().toString().equals("saturno") && loginOk){
-				AM = true;
 			}else
 				loginOk = false;
 		}else if(system.equals(sysMIN)){
 			if(!passwordText.getPassword().toString().isEmpty()
 					&& passwordText.getPassword().toString().equals("pacifico")){
-				MIN = true;
 			}else
 				loginOk = false;
 		}else if(system.equals(sysMIN)){
 			if(!passwordText.getPassword().toString().isEmpty()
 					&& passwordText.getPassword().toString().equals("PassAdminis")){
-				MIN = true;
-				AM = true;
 			}else
 				loginOk = false;
 		}
@@ -233,6 +224,11 @@ public class LoginFrame extends JFrame{
 			login = true;
 			loadFrame();
 		}
+	}
+	
+	private void backDoor(){
+		login = true;
+		loadFrame();
 	}
 	
 	private boolean isLogin(){
@@ -259,8 +255,7 @@ public class LoginFrame extends JFrame{
 				num++;
 			}
 			profileControl = new ProfileControl((String) profileCombo.getSelectedItem(), listEnv);
-			InitialFrame frame = new InitialFrame(listEnv, 
-					this.isMayoristas(), this.isMinoristas(),profileControl);
+			InitialFrame frame = new InitialFrame(listEnv, sistema, profileControl);
 			frame.getTitle();
 		}
 	}

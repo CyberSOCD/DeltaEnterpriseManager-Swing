@@ -14,9 +14,11 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
+import vista.ui.Dialog.MessageCenterDialog;
 import vista.ui.Frames.InitialFrame;
 import vista.ui.Panels.Status.StatusPanel;
 import vista.ui.Profiles.ProfileControl;
+import vista.ui.Profiles.ProfileControl.TipoSistema;
 import controlador.common.UserConnectionData;
 import controlador.common.UserConnectionDataComparator;
 
@@ -36,17 +38,17 @@ public class EnvironmentPanel extends JPanel{
 	private JCheckBox Mayoristas;
 	private FilterEnvironmentPanel filter;
 	private ArrayList<UserConnectionData> data;
+	private ArrayList<UserConnectionData> partialData;
 	private boolean isTesting = true;
-	private boolean isMinoristas;
-	private boolean isMayoristas;
+	private TipoSistema sistema;
 	private InitialFrame parent;
 	
-	public EnvironmentPanel(ArrayList<UserConnectionData> ListData, boolean isAm,boolean isMin, ProfileControl profile, InitialFrame parent){
+	
+	public EnvironmentPanel(ArrayList<UserConnectionData> ListData, TipoSistema tipo, ProfileControl profile, InitialFrame parent){
 		// Inicializa la lista de paneles de estado
 		this.parent = parent; 
 		this.profile = profile;
-		isMinoristas = isMin;
-		isMayoristas = isAm;
+		this.sistema = tipo;
 		data = ListData;
 		setLayout(new BorderLayout());
 		initialize();
@@ -59,62 +61,49 @@ public class EnvironmentPanel extends JPanel{
 	 */
 	private void initialize(){
 		UserConnectionDataComparator comparator = new UserConnectionDataComparator(profile);
-		Collections.sort(data,comparator);
-		for(UserConnectionData info:data){
-			if(profile.isAdmin()){
-				StatusPanel pan = new StatusPanel(info,info.getEnvName(), profile);
-				envList.add(pan);
-				if(!info.isProfile()){
-					pan.desactivatePanel();
-				}
-			}else if(isMinoristas && !isMayoristas){
-				if(!info.getEnvName().contains(" AM")){
-					StatusPanel pan = new StatusPanel(info,info.getEnvName(), profile);
-					envList.add(pan);
-					if(!info.isProfile()){
-						pan.desactivatePanel();
-					}
-				}
-			}else if (!isMinoristas && isMayoristas){
-				if(info.getEnvName().contains(" AM")){
-					StatusPanel pan = new StatusPanel(info,info.getEnvName(), profile);
-					envList.add(pan);
-					if(!info.isProfile()){
-						pan.desactivatePanel();
-					}
-				}
-			}
+		partialData = profile.getProfileList(data);
+		Collections.sort(partialData,comparator);
+		//Mantiene unicamente los entornos que corresponden al perfil en cuestion
+		for(UserConnectionData info:partialData){
+			StatusPanel pan = new StatusPanel(info,info.getEnvName(), profile);
+			envList.add(pan);
 		}
-		
 		statusPanelContainer = new JPanel();
 		statusPanelContainer.setLayout(new GridLayout(envList.size(),1));
 		Minoristas = new JCheckBox();
 		Minoristas.setText("Minoristas");
-		Minoristas.setSelected(isMinoristas||profile.isAdmin());
+		Minoristas.setSelected(sistema.equals(TipoSistema.MINORISTA));
 		Minoristas.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				updateEnvironment();
+				if(isTesting){
+					MessageCenterDialog.showInformationDialog(parent, "Actualmente se estan validando entornos se debe para antes de cambiar el sistema seleccionado");
+					Minoristas.setSelected(!Minoristas.isSelected());
+				}else
+					updateEnvironment();
 			}
 		});
 		Minoristas.setEnabled(false);
 		Mayoristas = new JCheckBox();
 		Mayoristas.setText("Mayoristas");
-		Mayoristas.setSelected(isMayoristas||profile.isAdmin());
+		Mayoristas.setSelected(sistema.equals(TipoSistema.MAYORISTA)||profile.isAdmin());
 		Mayoristas.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				updateEnvironment();
+				if(isTesting){
+					MessageCenterDialog.showInformationDialog(parent, "Actualmente se estan validando entornos se debe para antes de cambiar el sistema seleccionado");
+					Mayoristas.setSelected(!Mayoristas.isSelected());
+				}else
+					updateEnvironment();
 			}
 		});
 		Mayoristas.setEnabled(false);
-//		System.out.println(profile.getSelectedProfile());
 		if(profile.isAdmin()){
 			Mayoristas.setEnabled(true);
 			Minoristas.setEnabled(true);
 		}else{
-			Mayoristas.setVisible(isMayoristas);
-			Minoristas.setVisible(isMinoristas);
+			Mayoristas.setVisible(sistema.equals(TipoSistema.MAYORISTA));
+			Minoristas.setVisible(sistema.equals(TipoSistema.MINORISTA));
 		}
 		
 		filter = new FilterEnvironmentPanel(Minoristas, Mayoristas);
@@ -153,37 +142,29 @@ public class EnvironmentPanel extends JPanel{
 	 * Actualiza los componentes del panel para que refresque los StatusPanel filtrados
 	 */
 	private void updateEnvironment(){
+		//Si se está validando se impide el cambio de sistema
+		if(Minoristas.isSelected() && Mayoristas.isSelected()){
+			sistema = TipoSistema.AMBOS;
+		}else{
+			if(Minoristas.isSelected())
+				sistema = TipoSistema.MINORISTA;
+			else if(Mayoristas.isSelected())
+				sistema = TipoSistema.MAYORISTA;
+		}
+		
 		UserConnectionDataComparator comparator = new UserConnectionDataComparator(profile);
 		for(StatusPanel panel:envList){
-			panel.stopValidation();
+//			panel.stopValidation();
 			statusPanelContainer.remove(panel);
 		}
 		envList.clear();
-		Collections.sort(data,comparator);
-		for(UserConnectionData info:data){
-			if(Minoristas.isSelected() && !Mayoristas.isSelected()){
-				if(!info.getEnvName().contains(" AM")){
-					StatusPanel pan = new StatusPanel(info,info.getEnvName(), profile);
-					envList.add(pan);
-					if(!info.isProfile()){
-						pan.desactivatePanel();
-					}
-				}
-			}else if (!Minoristas.isSelected() && Mayoristas.isSelected()){
-				if(info.getEnvName().contains(" AM")){
-					StatusPanel pan = new StatusPanel(info,info.getEnvName(), profile);
-					envList.add(pan);
-					if(!info.isProfile()){
-						pan.desactivatePanel();
-					}
-				}
-			}else if(Minoristas.isSelected() && Mayoristas.isSelected()){
-				StatusPanel pan = new StatusPanel(info,info.getEnvName(), profile);
-				envList.add(pan);
-				if(!info.isProfile()){
-					pan.desactivatePanel();
-				}
-			}
+		
+		partialData = profile.getSystemProfileList(data, sistema);
+		Collections.sort(partialData,comparator);
+		//Mantiene unicamente los entornos que corresponden al perfil en cuestion
+		for(UserConnectionData info:partialData){
+			StatusPanel pan = new StatusPanel(info,info.getEnvName(), profile);
+			envList.add(pan);
 		}
 		statusPanelContainer.setLayout(new GridLayout(envList.size(),1));
 		for(StatusPanel panel:envList){
@@ -206,14 +187,15 @@ public class EnvironmentPanel extends JPanel{
 	public void stopValidation(){
 		UpdateStatus.setText("Reanudar validación");
 		for(StatusPanel panel:envList){
-			panel.stopValidation();
+			if(panel.isTesting())
+				panel.stopValidation();
 		}
 		parent.stopValidationInf();
 	}
 	public void resumeValidation(){
 		UpdateStatus.setText("Parar validación");
 		for(StatusPanel panel:envList){
-			if(!panel.isTesting())
+//			if(!panel.isTesting())
 				panel.resumeValidation();
 		}
 		parent.resumeValidationInf();

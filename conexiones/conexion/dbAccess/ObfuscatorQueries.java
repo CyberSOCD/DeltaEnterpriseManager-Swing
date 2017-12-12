@@ -6,50 +6,56 @@ import java.util.Iterator;
 import ofuscado.query.UpdateObject;
 
 public class ObfuscatorQueries {
-	
+
 	/**
 	 * 
-	 ****	PARAMETROS DE LA QUERY
+	 **** PARAMETROS DE LA QUERY
 	 * 
-	 * &APP_DNS			URL del balanceador (si hay), en caso de no ser necesario dar valor NULL
-	 * &SERVER_DNS			El DNS del servidor del entorno
-	 * &SERVER_DNS2		El DNS del servidor del entorno, opcional, en caso de no ser necesario, dar valor NULL
-	 * &SERVER_DNS3		El DNS del servidor del entorno, opcional, en caso de no ser necesario, dar valor NULL
-	 * &SERVER_DNS4		El DNS del servidor del entorno, opcional, en caso de no ser necesario, dar valor NULL
-	 * &SERVER_IP			La IP del servidor del entorno
-	 * &SERVER_IP2			La IP del servidor del entorno, opcional, en caso de no ser necesario, dar valor NULL
-	 * &SERVER_IP3			La IP del servidor del entorno, opcional, en caso de no ser necesario, dar valor NULL
-	 * &SERVER_IP4			La IP del servidor del entorno, opcional, en caso de no ser necesario, dar valor NULL
-	 * &SERVER_PORT		Puerto utilizado por el DNS
-	 * &SERVICE_DB			Utilizado para ofuscar campos de correo
-	 * &FAX				Utilizado para ofuscar Fax. Valor por defecto:99999999999
-	 * &FTP_COMUN			Servidor FTP comun para todos los entornos (Solicitado Sonsoles)
-	 * &FTP_COMUN_USER		Usuario acceso FTP comun para todos los entornos (Solicitado Sonsoles)
-	 * &FTP_COMUN_PASS		Password FTP comun para todos los entornos (Solicitado Sonsoles)
-	 * &SERVER_FTP_USER	Usuario FTP acceso al entorno
-	 * &SERVER_FTP_PASS	Password FTP acceso al entorno
+	 * &APP_DNS URL del balanceador (si hay), en caso de no ser necesario dar
+	 * valor NULL &SERVER_DNS El DNS del servidor del entorno &SERVER_DNS2 El
+	 * DNS del servidor del entorno, opcional, en caso de no ser necesario, dar
+	 * valor NULL &SERVER_DNS3 El DNS del servidor del entorno, opcional, en
+	 * caso de no ser necesario, dar valor NULL &SERVER_DNS4 El DNS del servidor
+	 * del entorno, opcional, en caso de no ser necesario, dar valor NULL
+	 * &SERVER_IP La IP del servidor del entorno &SERVER_IP2 La IP del servidor
+	 * del entorno, opcional, en caso de no ser necesario, dar valor NULL
+	 * &SERVER_IP3 La IP del servidor del entorno, opcional, en caso de no ser
+	 * necesario, dar valor NULL &SERVER_IP4 La IP del servidor del entorno,
+	 * opcional, en caso de no ser necesario, dar valor NULL &SERVER_PORT Puerto
+	 * utilizado por el DNS &SERVICE_DB Utilizado para ofuscar campos de correo
+	 * &FAX Utilizado para ofuscar Fax. Valor por defecto:99999999999 &FTP_COMUN
+	 * Servidor FTP comun para todos los entornos (Solicitado Sonsoles)
+	 * &FTP_COMUN_USER Usuario acceso FTP comun para todos los entornos
+	 * (Solicitado Sonsoles) &FTP_COMUN_PASS Password FTP comun para todos los
+	 * entornos (Solicitado Sonsoles) &SERVER_FTP_USER Usuario FTP acceso al
+	 * entorno &SERVER_FTP_PASS Password FTP acceso al entorno
 	 * 
 	 * 
 	 * 
-	 * FTP_COMUN/USER/PASS :::  ftp.intranet.gasnatural.com/delta1/delta1      Es comun a todos los entornos
+	 * FTP_COMUN/USER/PASS ::: ftp.intranet.gasnatural.com/delta1/delta1 Es
+	 * comun a todos los entornos
 	 * 
 	 * 
 	 */
-	
-	
-	public static String getSimpleQuery(String tableName, ArrayList<UpdateObject> columns){
+
+	public static String getSimpleQuery(String tableName,
+			ArrayList<UpdateObject> columns) {
 		Iterator<UpdateObject> it = columns.iterator();
-		String query = "SELECT COUNT(*) FROM " + tableName + " WHERE (\n";
-		while(it.hasNext()){
+		String query = "SELECT COUNT(*) REGISTROS, MIN(UPDATE_DATE) FECHA_OFUSCADO FROM " + tableName + " WHERE (\n";
+		while (it.hasNext()) {
 			query += it.next().getConditionValue();
-			if(it.hasNext())
+			if (it.hasNext())
 				query += " OR ";
 		}
-		query += ") AND UPDATE_USER != 'OFUSCADO_2';";
+		query += ") AND UPDATE_USER != 'OFUSCADO_2' AND UPDATE_DATE <= (SELECT MAX(UPDATE_DATE) FROM "
+				+ tableName + " WHERE UPDATE_USER = 'OFUSCADO_2')";
 		return query;
 	}
 	
-	
+	public static String getOfusDate(String table){
+		return "SELECT MIN(UPDATE_DATE) UPDATE_DATE FROM " + table + " WHERE UPDATE_USER = 'OFUSCADO_2'";
+	}
+
 	public static String getSearchMultipleRowsQuery(String tableName,
 			ArrayList<UpdateObject> columns) {
 		Iterator<UpdateObject> it = columns.iterator();
@@ -67,8 +73,7 @@ public class ObfuscatorQueries {
 		while (it.hasNext()) {
 			UpdateObject obj = it.next();
 			query += "SELECT * FROM " + tableName + " WHERE \n";
-			query += obj.getConditionValue() + ") " + alias + cont
-					+ "\n";
+			query += obj.getConditionValue() + ") " + alias + cont + "\n";
 			query += " ON " + baseCompare + ".ROWID = " + alias + cont
 					+ ".ROWID \n";
 			if (it.hasNext())

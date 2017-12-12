@@ -9,6 +9,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import vista.ui.Profiles.ProfileControl;
+import vista.ui.Profiles.ProfileControl.TipoSistema;
 
 @SuppressWarnings("serial")
 public abstract class GenericControlTab extends JPanel {
@@ -18,14 +19,12 @@ public abstract class GenericControlTab extends JPanel {
 	protected JPanel panelMayorista;
 	private JLabel labelMin;
 	private JLabel labelAM;
-	protected boolean isMinoristas;
-	protected boolean isMayoristas;
 	private ProfileControl profile;
+	protected TipoSistema sistema;
 	
 	
-	public GenericControlTab(boolean isAM,boolean isMIN,ProfileControl profile){
-		isMinoristas = isMIN;
-		isMayoristas = isAM;
+	public GenericControlTab(TipoSistema tipo,ProfileControl profile){
+		sistema = tipo;
 		this.profile = profile;
 		initialize();
 	}
@@ -70,9 +69,9 @@ public abstract class GenericControlTab extends JPanel {
 			});
 		}
 		
-		if(isMinoristas)
+		if(sistema.equals(TipoSistema.MINORISTA))
 			profilePanel.add(panelMinorista);
-		if(isMayoristas || profile.isAdmin())
+		if(sistema.equals(TipoSistema.MAYORISTA) || profile.isAdmin())
 			profilePanel.add(panelMayorista);
 		
 		labelMin = new JLabel("MINORISTAS");
@@ -84,9 +83,9 @@ public abstract class GenericControlTab extends JPanel {
 		labelMin.setAlignmentY(CENTER_ALIGNMENT);
 		labelAM.setAlignmentX(CENTER_ALIGNMENT);
 		labelAM.setAlignmentY(CENTER_ALIGNMENT);
-		if(isMinoristas)
+		if(sistema.equals(TipoSistema.MINORISTA))
 			profilePanel.add(panelMinorista);
-		if(isMayoristas || profile.isAdmin())
+		if(sistema.equals(TipoSistema.MAYORISTA) || profile.isAdmin())
 			profilePanel.add(panelMayorista);
 		if(profile.isAdmin())
 			setSelected(panelMinorista);

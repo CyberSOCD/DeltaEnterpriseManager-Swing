@@ -72,11 +72,6 @@ public class ExcelReporting {
 		}
 	}
 	
-	public ExcelReporting getXlsObject(){
-		return this;
-	}
-	
-	
 	/**
 	 * Crea o reutiliza un libro Excel para almacenar los datos de log
 	 * @throws IOException 

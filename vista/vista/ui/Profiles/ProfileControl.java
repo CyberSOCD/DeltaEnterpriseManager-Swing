@@ -15,6 +15,8 @@ public final class ProfileControl {
 	private ArrayList<UserConnectionData> listEnv;
 	private String selectedProfile;
 	private long healthValidationTimeout; //miliseconds
+	public static enum TipoSistema { MAYORISTA, MINORISTA, AMBOS};
+	private static String AM_Mark = " AM";
 	
 	public ProfileControl(String profile, ArrayList<UserConnectionData> listEnv){
 		selectedProfile = profile;
@@ -25,6 +27,49 @@ public final class ProfileControl {
 	
 	public boolean isAdmin(){
 		return selectedProfile.equals(ProfileConstants.ADMINISTRADOR);
+	}
+	
+	/**
+	 * Obtiene la lista correspondiente al perfil y el sistema seleccionado 
+	 * @param fullList
+	 * @param system
+	 * @return
+	 */
+	public ArrayList<UserConnectionData> getSystemProfileList(ArrayList<UserConnectionData> fullList, TipoSistema system){
+		ArrayList<UserConnectionData> result = new ArrayList<UserConnectionData>();
+		for(UserConnectionData usr:fullList){
+			if(checkEnvironment(usr) && checkSystem(usr, system)){
+				result.add(usr);
+			}
+		}
+		return result;
+	}
+	
+	/**
+	 * Obtiene la lista correspondiente al perfil seleccionado 
+	 * @param fullList
+	 * @param system
+	 * @return
+	 */
+	public ArrayList<UserConnectionData> getProfileList(ArrayList<UserConnectionData> fullList){
+		ArrayList<UserConnectionData> result = new ArrayList<UserConnectionData>();
+		for(UserConnectionData usr:fullList){
+			if(checkEnvironment(usr)){
+				result.add(usr);
+			}
+		}
+		return result;
+	}
+	
+	public boolean checkSystem(UserConnectionData user, TipoSistema system){
+		boolean condition = true;
+		if(system.equals(TipoSistema.MAYORISTA))
+			condition = user.getEnvName().contains(AM_Mark);
+		else if(system.equals(TipoSistema.MINORISTA))
+			condition = !user.getEnvName().contains(AM_Mark);
+		else
+			condition = true;
+		return condition;
 	}
 	
 	/**

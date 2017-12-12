@@ -1,5 +1,6 @@
 package controlador.validationPackage;
 
+import vista.ui.Profiles.ProfileControl.TipoSistema;
 import conexion.envAccess.EnvAccess;
 import controlador.builders.XmlBuilder;
 import controlador.common.ResultServlet;
@@ -14,16 +15,16 @@ public class OnlineValidation extends Validation{
 	private final String servlet_MIN= "/servlet/isf.servlets.gcqs.GcqsQuerySystemServlet";
 	private final String method_AM= "searchByCustomer";
 	private final String method_MIN= "Online_execute";
-	private boolean AM;
 	private String servlet;
 	private String method;
 	private UserConnectionData data;
 	private ResultServlet returnValue;
 	private GenericStatus status;
-	public OnlineValidation(UserConnectionData userData, boolean AM){
+	protected TipoSistema sistema;
+	public OnlineValidation(UserConnectionData userData, TipoSistema tipo){
+		sistema = tipo;
 		data = userData;
-		this.AM = AM;
-		if(AM){
+		if(sistema.equals(TipoSistema.MAYORISTA)){
 			servlet = servlet_AM;
 			method = method_AM;
 		}else{
@@ -41,7 +42,7 @@ public class OnlineValidation extends Validation{
 		//Realiza el envio al servlet
 		returnValue = env.invokeServlet();
 		//Valida el resultado devuelto de la prueba
-		CheckXmlOnline check = new CheckXmlOnline(returnValue, AM);
+		CheckXmlOnline check = new CheckXmlOnline(returnValue, sistema);
 		if(check.validarResultado()){
 			status.setCurrentStatus(EnvironmentStatus.CURRENT_STATUS_OK);
 			status.setErrorMessage("");

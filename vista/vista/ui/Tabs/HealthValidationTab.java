@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 
 import vista.ui.Panels.HealthComponentsPanel;
 import vista.ui.Profiles.ProfileControl;
+import vista.ui.Profiles.ProfileControl.TipoSistema;
 import controlador.common.UserConnectionData;
 
 /**
@@ -25,6 +26,7 @@ import controlador.common.UserConnectionData;
 public class HealthValidationTab extends GenericControlTab{
 	private ProfileControl profile;
 	private ArrayList<UserConnectionData> data;
+	private ArrayList<UserConnectionData> filterData;
 	private JPanel mainPanel;
 	private JPanel validationsPanel;
 	private JPanel buttonsPanel;
@@ -32,9 +34,11 @@ public class HealthValidationTab extends GenericControlTab{
 	private HealthComponentsPanel pan;
 	private JButton buttonValidate;
 	private JButton buttonClean;
+	private TipoSistema sistema;
 	
-	public HealthValidationTab(ArrayList<UserConnectionData> ListData, boolean isAM,boolean isMIN,ProfileControl profile){
-		super(isAM, isMIN,profile);
+	public HealthValidationTab(ArrayList<UserConnectionData> ListData, TipoSistema tipo,ProfileControl profile){
+		super(tipo, profile);
+		sistema = tipo;
 		this.profile = profile;
 		data = ListData;
  		initialize();
@@ -50,7 +54,8 @@ public class HealthValidationTab extends GenericControlTab{
 		setLayout(new GridLayout(1,1));
 		add(mainPanel);
 		panelActive = panelMinorista;
-		pan = new HealthComponentsPanel(getList(), isMayoristas,isMinoristas, profile);
+		filterData = profile.getSystemProfileList(data, sistema);
+		pan = new HealthComponentsPanel(filterData, sistema, profile);
 		
 		validationsPanel = new JPanel();
 		validationsPanel.setLayout(new GridLayout(1,1));
@@ -133,57 +138,18 @@ public class HealthValidationTab extends GenericControlTab{
 		if(!panel.equals(panelActive)){
 			panelActive = panel;
 			if(panelActive.equals(panelMayorista)){
+				sistema = TipoSistema.MAYORISTA;
+				filterData = profile.getSystemProfileList(data, sistema);
 				unSelected(panelMinorista);
-				pan.reloadComponents(getList(), true, false);
-				isMayoristas = true;
-				isMinoristas = false;
+				pan.reloadComponents(filterData, sistema);
 			}
 			else{
+				sistema = TipoSistema.MINORISTA;
+				filterData = profile.getSystemProfileList(data, sistema);
 				unSelected(panelMayorista);
-				pan.reloadComponents(getList(), false, true);
-				isMayoristas = false;
-				isMinoristas = true;
+				pan.reloadComponents(filterData, sistema);
 			}
 			setSelected(panelActive);
 		}
-	}
-	
-	private ArrayList<UserConnectionData> getList(){
-		ArrayList<UserConnectionData> aux = new ArrayList<UserConnectionData>();
-		boolean isAM = isMayoristas;
-		boolean isMIN = isMinoristas;
-		if(panelActive.equals(panelMayorista)){
-			isAM = true;
-			isMIN = false;
-		}else if(panelActive.equals(panelMinorista)){
-			isMIN = true;
-			isAM = false;
-		}
-		if(!profile.isAdmin()){
-			for(UserConnectionData d:data){
-				if(isMayoristas){
-					if(d.getEnvName().contains("AM")){
-						aux.add(d);
-					}
-				}else if(isMinoristas){
-					if(!d.getEnvName().contains("AM")){
-						aux.add(d);
-					}
-				}
-			}
-		}else{
-			for(UserConnectionData d:data){
-				if(isAM){
-					if(d.getEnvName().contains("AM")){
-						aux.add(d);
-					}
-				}else if(isMIN){
-					if(!d.getEnvName().contains("AM")){
-						aux.add(d);
-					}
-				}
-			}
-		}
-		return aux;
 	}
 }

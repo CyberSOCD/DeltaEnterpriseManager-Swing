@@ -7,33 +7,38 @@ import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
+import vista.ui.Dialog.MessageCenterDialog;
+import vista.ui.Panels.ObfuscatorPanel;
 import vista.ui.Profiles.ProfileControl;
+import vista.ui.Profiles.ProfileControl.TipoSistema;
 import controlador.common.UserConnectionData;
 
 @SuppressWarnings("serial")
 public class ObfuscatorValidationTab extends GenericControlTab {
 	
 	private ProfileControl profile;
-	private ArrayList<UserConnectionData> listData;
+	private ArrayList<UserConnectionData> fullListData;
 	//JPanels
 	private JPanel mainPanel;
-	private JPanel validationsPanel;
+	private ObfuscatorPanel validationsPanel;
 	private JPanel buttonsPanel;
 	private JPanel panelActive;
+	private TipoSistema sistema;
 
 	public ObfuscatorValidationTab(ArrayList<UserConnectionData> ListData,
-			boolean isAM, boolean isMIN, ProfileControl profile) {
-		super(isAM,isMIN,profile);
+			TipoSistema tipo, ProfileControl profile) {
+		super(tipo,profile);
+		sistema = tipo;
 		this.profile = profile;
-		this.listData = ListData;
+		this.fullListData = ListData;
 		initialize();
+		loadComponent();
 	}
 
 	@Override
 	public void loadComponent() {
-
+		
 	}
-
 	
 	/**
 	 * Inicializa los componentes del panel
@@ -43,7 +48,7 @@ public class ObfuscatorValidationTab extends GenericControlTab {
 		mainPanel.setLayout(new BorderLayout(5, 5));
 		setLayout(new GridLayout(1,1));
 		add(mainPanel);
-		validationsPanel = new JPanel();
+		validationsPanel = new ObfuscatorPanel(fullListData, profile, sistema);
 		panelActive = panelMinorista;
 		buttonsPanel = new JPanel();
 		
@@ -56,7 +61,7 @@ public class ObfuscatorValidationTab extends GenericControlTab {
 		gridBag.gridx = 0;
 		gridBag.gridy = 0;
 		mainPanel.add(profilePanel, BorderLayout.NORTH);
-		gridBag.fill = GridBagConstraints.HORIZONTAL;
+		gridBag.fill = GridBagConstraints.BOTH;
 		gridBag.ipady = 70;
 		gridBag.weightx = 0.0;
 		gridBag.gridwidth = 3;
@@ -71,26 +76,26 @@ public class ObfuscatorValidationTab extends GenericControlTab {
 		gridBag.gridx = 0;
 		gridBag.gridy = 2;
 		mainPanel.add(buttonsPanel, BorderLayout.SOUTH);
-		
 	}
 	
 	@Override
 	protected void changeSelected(JPanel panel){
+		if(validationsPanel.isValidating()){
+			MessageCenterDialog.showWarningDialog(this, "Se está validando un entorno, no se puede cambiar de sistema");
+			return;
+		}
 		if(!panel.equals(panelActive)){
 			panelActive = panel;
 			if(panelActive.equals(panelMayorista)){
 				unSelected(panelMinorista);
-//				pan.reloadComponents(getList(), true, false);
-				isMayoristas = true;
-				isMinoristas = false;
+				sistema = TipoSistema.MAYORISTA;
 			}
 			else{
 				unSelected(panelMayorista);
-//				pan.reloadComponents(getList(), false, true);
-				isMayoristas = false;
-				isMinoristas = true;
+				sistema = TipoSistema.MINORISTA;
 			}
 			setSelected(panelActive);
+			validationsPanel.changeSystem(sistema);
 		}
 	}
 }

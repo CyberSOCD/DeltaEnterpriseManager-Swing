@@ -1,5 +1,7 @@
 package controlador.xmlCheck;
 
+import vista.ui.Profiles.ProfileControl.TipoSistema;
+
 import com.gargoylesoftware.htmlunit.html.DomAttr;
 import com.gargoylesoftware.htmlunit.html.DomElement;
 import com.gargoylesoftware.htmlunit.xml.XmlPage;
@@ -9,20 +11,20 @@ import controlador.common.ResultServlet;
 public class CheckXmlOnline {
 
 	private XmlPage xml;
-	private boolean isMayoristas;
+	private TipoSistema sistema;
 	
-	public CheckXmlOnline(ResultServlet result, boolean AM){
+	public CheckXmlOnline(ResultServlet result, TipoSistema tipo){
 		if(result.getDriver() == null)
 			xml=null;
 		else
 			xml = result.getDriver().getXmlPage();
-		isMayoristas = AM;
+		sistema = tipo;
 	}
 	/**
 	 * Comprueba si no hay error en la respuesta del servidor
 	 */
 	public boolean validarResultado(){
-		return xml == null?false:isMayoristas?validateAM():validateMIN();
+		return xml == null?false:validate();
 	}
 	
 	public String getErrorMessage(){
@@ -35,6 +37,16 @@ public class CheckXmlOnline {
 	
 	private DomAttr getAttribute(DomElement domElement, String attribute){
 		return domElement.getAttributeNode(attribute);
+	}
+	
+	private boolean validate(){
+		boolean valor = false;
+		if(sistema.equals(TipoSistema.MAYORISTA)){
+			valor = validateAM();
+		}else if(sistema.equals(TipoSistema.MINORISTA)){
+			valor = validateMIN();
+		}
+		return valor;
 	}
 	
 	private boolean validateAM(){

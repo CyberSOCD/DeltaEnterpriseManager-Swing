@@ -19,6 +19,7 @@ import controlador.validationPackage.ObfuscatorValidation;
 import vista.ui.Panels.EnvironmentPanel;
 import vista.ui.Panels.TestingPanel;
 import vista.ui.Profiles.ProfileControl;
+import vista.ui.Profiles.ProfileControl.TipoSistema;
 
 /**
  * 
@@ -29,8 +30,6 @@ import vista.ui.Profiles.ProfileControl;
 public class InitialFrame extends JFrame {
 	private EnvironmentPanel validationPanel;
 	private TestingPanel testPanel;
-	private boolean isMinoristas;
-	private boolean isMayoristas;
 	private ProfileControl prof;
 	private JMenuBar menuBar;
 	private JMenu menuEntorno;
@@ -38,23 +37,25 @@ public class InitialFrame extends JFrame {
 	private JMenu subMenuEntornoEstado;
 	private JMenuItem exitMenuItem;
 	private JMenuItem validacionMenuItem;
+	private JMenuItem ofuscadoMenuItem;
 	private JMenuItem stopValidationMenuItem;
 	private JMenuItem resumeValidationMenuItem;
 	private JMenuItem obfuscatorValidationMenuItem;
 	private ArrayList<UserConnectionData> data;
+	private TipoSistema sistema;
 
 	/**
 	 * Constructor inicializa el objeto que maneja los datos
 	 */
-	public InitialFrame(ArrayList<UserConnectionData> data, boolean isAm, boolean isMin, ProfileControl profile) {
+	public InitialFrame(ArrayList<UserConnectionData> data, TipoSistema tipo, ProfileControl profile) {
 		// Inicializa el objeto Webclass para evitar falsear tiempos de
 		// respuesta
 		this.data = data;
 		prof = profile;
-		isMayoristas = isAm;
-		isMinoristas = isMin;
-		validationPanel = new EnvironmentPanel(data,isMayoristas, isMinoristas, profile,this);
-		testPanel = new TestingPanel(data, isMayoristas, isMinoristas, profile);
+		this.sistema = tipo;
+		validationPanel = new EnvironmentPanel(data,sistema, profile,this);
+		System.out.println(sistema);
+		testPanel = new TestingPanel(data, tipo, profile);
 		setLayout(new GridLayout(1, 2));
 		initialize();
 	}
@@ -112,6 +113,13 @@ public class InitialFrame extends JFrame {
 			}
 		});
 		
+		ofuscadoMenuItem = new JMenuItem(new AbstractAction("Validación ofuscado") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				testPanel.selectObfuscado();
+			}
+		});
+		
 		stopValidationMenuItem = new JMenuItem(new AbstractAction("Parar validacion") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -129,12 +137,12 @@ public class InitialFrame extends JFrame {
 		});
 		resumeValidationMenuItem.setEnabled(false);
 		
-		obfuscatorValidationMenuItem = new JMenuItem(new AbstractAction("Generar script Ofuscado") {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				control();
-			}
-		});
+//		obfuscatorValidationMenuItem = new JMenuItem(new AbstractAction("Generar script Ofuscado") {
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				control();
+//			}
+//		});
 		exitMenuItem = new JMenuItem(new AbstractAction("Salir") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -145,13 +153,15 @@ public class InitialFrame extends JFrame {
 		
 		//-------------------------------------------------------------
 		menuAcciones.add(validacionMenuItem);
+		if(prof.isAdmin())
+			menuAcciones.add(ofuscadoMenuItem);
 		
 		menuEntorno.add(subMenuEntornoEstado);
 		subMenuEntornoEstado.add(stopValidationMenuItem);
 		subMenuEntornoEstado.add(resumeValidationMenuItem);
 		menuEntorno.addSeparator();
 		menuEntorno.add(exitMenuItem);
-		menuEntorno.add(obfuscatorValidationMenuItem);
+//		menuEntorno.add(obfuscatorValidationMenuItem);
 		menuBar.add(menuEntorno);
 		menuBar.add(menuAcciones);
 	}

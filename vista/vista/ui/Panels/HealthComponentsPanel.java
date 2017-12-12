@@ -27,6 +27,7 @@ import controlador.validationPackage.OnlineValidation;
 import vista.ui.CheckBox.CooldownCheckBox;
 import vista.ui.Panels.Status.DumbStatusPanel;
 import vista.ui.Profiles.ProfileControl;
+import vista.ui.Profiles.ProfileControl.TipoSistema;
 /**
  * 
  * Panel que maneja el estado de varias validaciones
@@ -43,7 +44,7 @@ public class HealthComponentsPanel extends JPanel{
 	private final int batchPos = 3;
 	
 	private JPanel mainPanel;
-	private boolean isMayoristas;
+	private TipoSistema sistema;
 //	private boolean isMinoristas;
 	private boolean globalChange = false;
 	private HashMap<CooldownCheckBox,DumbStatusPanel[]> relation;
@@ -71,10 +72,10 @@ public class HealthComponentsPanel extends JPanel{
 	public final long offlineFreq = 5000;
 	public final long batchFreq = 500;
 	
-	public HealthComponentsPanel(ArrayList<UserConnectionData> envList, boolean isAM, boolean isMin, ProfileControl profile){
+	public HealthComponentsPanel(ArrayList<UserConnectionData> envList, TipoSistema tipo, ProfileControl profile){
+		sistema = tipo;
 		this.setOpaque(false);
 		this.profile = profile;
-		isMayoristas = isAM;
 //		isMinoristas = isMin;
 		relation = new HashMap<CooldownCheckBox, DumbStatusPanel[]>();
 		data = envList;
@@ -86,8 +87,9 @@ public class HealthComponentsPanel extends JPanel{
 	 * @param isAM
 	 * @param isMin
 	 */
-	public void reloadComponents(ArrayList<UserConnectionData> envList, boolean isAM, boolean isMin){
+	public void reloadComponents(ArrayList<UserConnectionData> envList,TipoSistema tipo){
 		removeAll();
+		sistema = tipo;
 		validationList.clear();
 		data.clear();
 		relation.clear();
@@ -96,8 +98,6 @@ public class HealthComponentsPanel extends JPanel{
 		batchList.clear();
 		loginList.clear();
 		data = envList;
-		isMayoristas = isAM;
-//		isMinoristas = isMin;
 		mainPanel.removeAll();
 		loginPanel.removeAll();
 		onlinePanel.removeAll();
@@ -191,7 +191,7 @@ public class HealthComponentsPanel extends JPanel{
 			DumbStatusPanel loginPanel = new DumbStatusPanel(new EnvStatusValidation(d), new EnvironmentStatus(), d);
 			loginList.add(loginPanel);
 			//Panel Online
-			DumbStatusPanel onlinePanel = new DumbStatusPanel(new OnlineValidation(d, isMayoristas), new OnlineStatus(), d);
+			DumbStatusPanel onlinePanel = new DumbStatusPanel(new OnlineValidation(d, sistema), new OnlineStatus(), d);
 			onlineList.add(onlinePanel);
 			//Panel Offline
 			DumbStatusPanel offlinePanel = new DumbStatusPanel(new OfflineValidation(d), new OfflineStatus(), d);

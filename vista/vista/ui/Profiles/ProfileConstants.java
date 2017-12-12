@@ -116,15 +116,15 @@ public abstract class ProfileConstants {
 			(char) 78, (char) 66, (char) 90, (char) 71, (char) 49, (char) 112,
 			(char) 98, (char) 107, (char) 82, (char) 70, (char) 84, (char) 81,
 			(char) 61, (char) 61 };
-	// Codigo de la contraseña mayoristas gestion saturno
+	// Codigo de la contraseña mayoristas gestion
 	public final static char[] cadena_AM = { (char) 99, (char) 50,
 			(char) 70, (char) 48, (char) 100, (char) 88, (char) 74, (char) 117,
 			(char) 98, (char) 119, (char) 61, (char) 61 };
-	// Codigo de la contraseña minoristas gestion pacifico
+	// Codigo de la contraseña minoristas gestion
 	public final static char[] cadena_min_ge = { (char) 99, (char) 71,
 			(char) 70, (char) 106, (char) 97, (char) 87, (char) 90, (char) 112,
 			(char) 89, (char) 50, (char) 56, (char) 61, (char) 61 };
-	// Codigo de la contraseña minoristas certificacion canada
+	// Codigo de la contraseña minoristas certificacion
 	public final static char[] cadena_min_ce = { (char) 89, (char) 50,
 			(char) 70, (char) 117, (char) 89, (char) 87, (char) 82, (char) 104 };
 }

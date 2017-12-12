@@ -8,6 +8,7 @@ import javax.swing.JTabbedPane;
 
 import controlador.common.UserConnectionData;
 import vista.ui.Profiles.ProfileControl;
+import vista.ui.Profiles.ProfileControl.TipoSistema;
 import vista.ui.Tabs.GenericControlTab;
 import vista.ui.Tabs.HealthValidationTab;
 import vista.ui.Tabs.ObfuscatorValidationTab;
@@ -20,6 +21,8 @@ public class TestingPanel extends JPanel {
 	private GenericControlTab validacionEntornos;
 	private GenericControlTab validacionOfuscado;
 	private static final int validationIndexTab = 0;
+	private static final int ofuscadoIndexTab = 1;
+	private TipoSistema sistema;
 
 	/**
 	 * 
@@ -27,17 +30,23 @@ public class TestingPanel extends JPanel {
 	 * @param isAM
 	 * @param isMIN
 	 */
-	public TestingPanel(ArrayList<UserConnectionData> ListData, boolean isAM,boolean isMIN, ProfileControl profile) {
+	public TestingPanel(ArrayList<UserConnectionData> ListData, TipoSistema tipo, ProfileControl profile) {
 		this.profile = profile;
 		setLayout(new GridLayout(1, 1));
-		validacionEntornos = new HealthValidationTab(ListData,isAM,isMIN,this.profile);
-		validacionOfuscado = new ObfuscatorValidationTab(ListData, isAM, isMIN, profile);
+		sistema = tipo;
+		validacionEntornos = new HealthValidationTab(ListData,sistema,this.profile);
+		validacionOfuscado = new ObfuscatorValidationTab(ListData, sistema, profile);
 		initialize();
 	}
 	
 	public void selectValidation(){
 		genericPanel.setVisible(true);
 		genericPanel.setSelectedIndex(validationIndexTab);
+	}
+	
+	public void selectObfuscado(){
+		genericPanel.setVisible(true);
+		genericPanel.setSelectedIndex(ofuscadoIndexTab);
 	}
 
 	/**
@@ -47,7 +56,8 @@ public class TestingPanel extends JPanel {
 
 		genericPanel = new JTabbedPane();
 		genericPanel.addTab("Validación entornos", validacionEntornos);
-		genericPanel.addTab("Validación Ofuscado", validacionOfuscado);
+		if(profile.isAdmin())
+			genericPanel.addTab("Validación Ofuscado", validacionOfuscado);
 		add(genericPanel);
 		
 		genericPanel.setVisible(false);

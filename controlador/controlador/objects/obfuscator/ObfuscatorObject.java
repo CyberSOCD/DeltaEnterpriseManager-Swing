@@ -5,10 +5,11 @@ import java.util.Date;
 
 public class ObfuscatorObject {
 
+	private Date fechaValidacion;
 	private Date fechaOfuscado;
 
-	private ArrayList<String> tablasOfuscadas;
 	private ArrayList<String> tablasAOfuscar;
+	private ArrayList<String> tablasOfuscadas;
 	private ArrayList<String> tablasSinOfuscar;
 	
 	private int numTablasOfuscadas;
@@ -55,20 +56,28 @@ public class ObfuscatorObject {
 		this.tablasOfuscadas = tablasOfuscadas;
 	}
 
-	public ArrayList<String> getTablasAOfuscadas() {
+	public ArrayList<String> getTablasAOfuscar() {
 		return tablasAOfuscar;
 	}
 
-	public void setTablasAOfuscadas(ArrayList<String> tablasAOfuscadas) {
+	public void setTablasAOfuscar(ArrayList<String> tablasAOfuscadas) {
 		this.tablasAOfuscar = tablasAOfuscadas;
 	}
 
-	public ArrayList<String> getTablasSinOfuscadas() {
+	public ArrayList<String> getTablasSinOfuscar() {
 		return tablasSinOfuscar;
 	}
 
-	public void setTablasSinOfuscadas(ArrayList<String> tablasSinOfuscadas) {
+	public void setTablasSinOfuscar(ArrayList<String> tablasSinOfuscadas) {
 		this.tablasSinOfuscar = tablasSinOfuscadas;
+	}
+
+	public Date getFechaValidacion() {
+		return fechaValidacion;
+	}
+
+	public void setFechaValidacion(Date fechaValidacion) {
+		this.fechaValidacion = fechaValidacion;
 	}
 
 }

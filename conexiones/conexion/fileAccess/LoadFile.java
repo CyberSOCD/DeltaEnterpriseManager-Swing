@@ -1,7 +1,9 @@
 package conexion.fileAccess;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -63,5 +65,41 @@ public class LoadFile {
 			System.out.println(e.getMessage());
 		}
 		return fileLines;
+	}
+	
+	public static void appendText(String relativeFolder, String fileName, String text){
+		BufferedWriter bw = null;
+		FileWriter fw = null;
+		try{
+			fw = new FileWriter("./" + relativeFolder + "/" + fileName,true);
+			bw = new BufferedWriter(fw);
+			bw.append(text);
+			bw.close();
+			fw.close();
+		}catch(IOException ex){
+			System.out.println("ERROR DE LECTURA/APERTURA DEL FICHERO");
+			System.out.println(ex.getMessage());
+		}catch(Exception e){
+			System.out.println("ERROR INESPERADO CONTACTE CON ADMINISTRADOR");
+			System.out.println(e.getMessage());
+		}
+	}
+	
+	public static void appendNewLine(String relativeFolder, String fileName){
+		BufferedWriter bw = null;
+		FileWriter fw = null;
+		try{
+			fw = new FileWriter("./" + relativeFolder + "/" + fileName, true);
+			bw = new BufferedWriter(fw);
+			bw.newLine();
+			bw.close();
+			fw.close();
+		}catch(IOException ex){
+			System.out.println("ERROR DE LECTURA/APERTURA DEL FICHERO");
+			System.out.println(ex.getMessage());
+		}catch(Exception e){
+			System.out.println("ERROR INESPERADO CONTACTE CON ADMINISTRADOR");
+			System.out.println(e.getMessage());
+		}
 	}
 }

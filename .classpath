@@ -9,7 +9,6 @@
 	<classpathentry kind="src" path="controlador"/>
 	<classpathentry kind="src" path="conexiones"/>
 	<classpathentry excluding="imgs/" including="**/*.java" kind="src" path="resources"/>
-	<classpathentry kind="src" path="resources/imgs"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/htmlUnitLibrary"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/poiLibrary"/>

@@ -61,6 +61,8 @@ public class LogControl {
 		}
 		lineLog = lineLog + connector + "Tiempo de respuesta: " + status.getElapsedTime() + " milisegundos.";
 		lineLogXls = lineLogXls + connector + status.getElapsedTime();
+		if(excelLog==null)
+			activeLog();
 		excelLog.writeLine(lineLogXls);
 		try {
 			buffWriter = getLogWriter();
@@ -95,11 +97,12 @@ public class LogControl {
 	 * Escribe el log obtenido en el fichero
 	 */
 	public void stopValidation(){
-		excelLog.stopValidation();
+		if(excelLog != null)
+			excelLog.stopValidation();
 	}
 	
 	public ExcelReporting getXlsObject(){
-		return excelLog.getXlsObject();
+		return excelLog;
 	}
 	
 	/**
