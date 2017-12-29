@@ -69,7 +69,6 @@ public class DriverDB {
 		openConnection();
 		stmt = null;
 		ResultSet res;
-		String value = "";
 		if(connection == null || connection.isClosed())
 			throw new Exception("La conexion debe estar creada y abierta para ejecutar la query");
 		stmt = connection.createStatement();

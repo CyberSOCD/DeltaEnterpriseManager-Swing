@@ -186,7 +186,6 @@ public class StatusPanel extends JPanel implements GenericStatusPanel{
 		thrd.interrupt();
 		timer = null;
 		thrd = null;
-		validate.stopValidation();
 	}
 	
 	public void startValidation(){ 
@@ -210,7 +209,6 @@ public class StatusPanel extends JPanel implements GenericStatusPanel{
 		thrd = new Thread(timer);
 		thrd.start();
 		timerVersion.setText(Integer.toString(freqTimeout) + " min");
-		validate.resumeValidation();
 	}
 	
 	public boolean isTesting(){

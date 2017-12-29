@@ -7,7 +7,6 @@ import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 
 import javax.swing.AbstractAction;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -15,7 +14,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JSplitPane;
 
 import controlador.common.UserConnectionData;
-import controlador.validationPackage.ObfuscatorValidation;
 import vista.ui.Panels.EnvironmentPanel;
 import vista.ui.Panels.TestingPanel;
 import vista.ui.Profiles.ProfileControl;
@@ -40,7 +38,6 @@ public class InitialFrame extends JFrame {
 	private JMenuItem ofuscadoMenuItem;
 	private JMenuItem stopValidationMenuItem;
 	private JMenuItem resumeValidationMenuItem;
-	private JMenuItem obfuscatorValidationMenuItem;
 	private ArrayList<UserConnectionData> data;
 	private TipoSistema sistema;
 
@@ -53,8 +50,7 @@ public class InitialFrame extends JFrame {
 		this.data = data;
 		prof = profile;
 		this.sistema = tipo;
-		validationPanel = new EnvironmentPanel(data,sistema, profile,this);
-		System.out.println(sistema);
+		validationPanel = new EnvironmentPanel(this.data,sistema, profile,this);
 		testPanel = new TestingPanel(data, tipo, profile);
 		setLayout(new GridLayout(1, 2));
 		initialize();
@@ -166,13 +162,6 @@ public class InitialFrame extends JFrame {
 		menuBar.add(menuAcciones);
 	}
 	
-	private void control(){
-		final JFileChooser fc = new JFileChooser();
-		int returnVale = fc.showOpenDialog(null);
-		if(returnVale == JFileChooser.APPROVE_OPTION){
-			ObfuscatorValidation v = new ObfuscatorValidation(fc.getSelectedFile(), data.get(0));
-		}
-	}
 	public void resumeValidationInf(){
 		resumeValidationMenuItem.setEnabled(false);
 		stopValidationMenuItem.setEnabled(true);

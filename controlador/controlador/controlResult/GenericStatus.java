@@ -3,16 +3,20 @@ package controlador.controlResult;
 import java.awt.Color;
 
 public interface GenericStatus {
+	
+	public enum CurrentStatusValue {
+		KO, OK, SLOW, REVISION, UNKNOWN
+	}
 
 	//Constants
 	
-	public final static int CURRENT_STATUS_UNKOWN =-1;
+	public final static int CURRENT_STATUS_UNKNOWN =-1;
 	public final static int CURRENT_STATUS_OK = 0;
 	public final static int CURRENT_STATUS_KO = 1;
 	public final static int CURRENT_STATUS_PDT = 2;
 	public final static int CURRENT_STATUS_REV = 3;
 	
-	public final static String CURRENT_STATUS_UNKOWN_STRING ="?";
+	public final static String CURRENT_STATUS_UNKNOWN_STRING ="?";
 	public final static String CURRENT_STATUS_OK_STRING = "OK";
 	public final static String CURRENT_STATUS_KO_STRING = "KO";
 	public final static String CURRENT_STATUS_PDT_STRING = "Pdt.";
@@ -47,6 +51,5 @@ public interface GenericStatus {
 	public abstract void setErrorMessage(String message);
 	
 	public abstract long getFrequencyValidation();
-	
 	
 }

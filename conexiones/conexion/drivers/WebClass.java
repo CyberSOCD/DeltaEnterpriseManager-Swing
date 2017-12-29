@@ -20,6 +20,10 @@ public class WebClass {
 	private WebClient webClient;
 	private Page page;
 
+	public WebClass(){
+		webClient = new WebClient();
+	}
+	
 	/**
 	 * Realiza la llamada efectiva contra la URL pasada
 	 * 
@@ -33,6 +37,7 @@ public class WebClass {
 	 * @throws SocketTimeoutException
 	 * @throws HttpHostConnectException
 	 */
+	
 	public void setURL(String URL, String xml) throws Exception, IOException,
 			MalformedURLException, FailingHttpStatusCodeException,
 			UnknownHostException, SocketTimeoutException,
@@ -40,8 +45,8 @@ public class WebClass {
 		WebRequest requestSettings = new WebRequest(new URL(URL),
 				HttpMethod.POST);
 		requestSettings.setRequestBody(xml);
-		webClient = new WebClient();
 		this.page = webClient.getPage(requestSettings);
+		webClient.close();
 	}
 
 	/**

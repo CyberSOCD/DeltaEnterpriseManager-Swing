@@ -68,7 +68,7 @@ public class OnlineStatus implements GenericStatus{
 	@Override
 	public boolean finishValidation() {
 		if(currentStatus == CURRENT_STATUS_KO || currentStatus == CURRENT_STATUS_OK||
-				currentStatus == CURRENT_STATUS_REV || currentStatus == CURRENT_STATUS_UNKOWN){
+				currentStatus == CURRENT_STATUS_REV || currentStatus == CURRENT_STATUS_UNKNOWN){
 			return true;
 		}
 		return false;
@@ -91,7 +91,7 @@ public class OnlineStatus implements GenericStatus{
 			result = CURRENT_STATUS_REV_STRING;
 			break;
 		default:
-			result  = CURRENT_STATUS_UNKOWN_STRING;
+			result  = CURRENT_STATUS_UNKNOWN_STRING;
 			break;
 		}
 		return result;

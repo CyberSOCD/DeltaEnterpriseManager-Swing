@@ -4,12 +4,15 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 import controlador.common.ResultServlet;
 import controlador.common.UserConnectionData;
 import controlador.controlResult.EnvironmentStatus;
+import controlador.tools.LogTools;
 
 /**
  * 
@@ -18,25 +21,24 @@ import controlador.controlResult.EnvironmentStatus;
  */
 public class LogControl {
 
+	/***************************************************************************************
+	 * Se debe implantar una rotacion de Log semanal para facilitar busqueda y reducir
+	 * consumo buscando el rango de fecha exacto
+	 **************************************************************************************/
+	
 	private UserConnectionData data;
 	private String file;
-	private String xlsFile;
 	private BufferedWriter buffWriter;
 	private final String connector =" - ";
-	private ExcelReporting excelLog;
-	private String currentDay;
+	private LogLineObject logObject;
 	
 	public LogControl(UserConnectionData data){
-		SimpleDateFormat date = new SimpleDateFormat("dd-MM-yyyy");
-        currentDay = date.format(Calendar.getInstance().getTime());
 		this.data = data;
 	}
 	
 	public void activeLog(){
 		try {
 			buffWriter = getLogWriter();
-			setFileXlsPath();
-			excelLog = new ExcelReporting(xlsFile);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -45,25 +47,24 @@ public class LogControl {
 	 * Escribe la linea del log
 	 * @param result
 	 * @param status
-	 * @param string 
+	 * @param string
 	 */
-	public void logActivity(ResultServlet result, EnvironmentStatus status){
-		String lineLog = getCurrentTime();
-		String lineLogXls;
-		lineLog = lineLog + connector;
-		lineLog = lineLog + status.getParsedCurrentStatus(status.getCurrentStatus());
-		lineLogXls = lineLog;
-		if(status.getCurrentStatus()== EnvironmentStatus.CURRENT_STATUS_KO){
-			lineLog = lineLog + connector + status.getErrorMessage();
-			lineLogXls = lineLog;
-		}else{
-			lineLogXls = lineLogXls + connector + " ";
-		}
-		lineLog = lineLog + connector + "Tiempo de respuesta: " + status.getElapsedTime() + " milisegundos.";
-		lineLogXls = lineLogXls + connector + status.getElapsedTime();
-		if(excelLog==null)
-			activeLog();
-		excelLog.writeLine(lineLogXls);
+	public void logActivity(ResultServlet result, EnvironmentStatus status, String serverVersion, String arqVersion){
+		String lineLog;
+		logObject = new LogLineObject();
+		logObject.setValidationDate(new Date());
+		logObject.setStatus(status.getCurrentStatus());
+		logObject.setResponseTime((int) status.getElapsedTime());
+		logObject.setErrorMessage(status.getErrorMessage());
+		logObject.setServerVersion(serverVersion);
+		logObject.setArqVersion(arqVersion);
+		lineLog = LogTools.serializeLineLog(logObject);
+//		lineLog = lineLog + connector;
+//		lineLog = lineLog + status.getParsedCurrentStatus(status.getCurrentStatus());
+//		if(status.getCurrentStatus()== EnvironmentStatus.CURRENT_STATUS_KO){
+//			lineLog = lineLog + connector + status.getErrorMessage();
+//		}
+//		lineLog = lineLog + connector + "Tiempo de respuesta: " + status.getElapsedTime() + " milisegundos.";
 		try {
 			buffWriter = getLogWriter();
 			buffWriter.append(lineLog);
@@ -72,49 +73,6 @@ public class LogControl {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-	
-	public void logReportFile(ResultServlet result, EnvironmentStatus status, String arqVersion, String version){
-		String lineLog = getCurrentTime();
-		lineLog = lineLog + connector;
-		lineLog = lineLog + status.getParsedCurrentStatus(status.getCurrentStatus());
-		if(status.getCurrentStatus()== EnvironmentStatus.CURRENT_STATUS_KO){
-			lineLog = lineLog + connector + status.getErrorMessage();
-		}
-		lineLog = lineLog + connector + "Tiempo de respuesta: " + status.getElapsedTime()
-				+ " milisegundos. - Version: " + version +  " - Version Arquitectura: " + arqVersion;
-		try {
-			buffWriter = getLogWriter();
-			buffWriter.append(lineLog);
-			buffWriter.newLine();
-			buffWriter.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	/**
-	 * Escribe el log obtenido en el fichero
-	 */
-	public void stopValidation(){
-		if(excelLog != null)
-			excelLog.stopValidation();
-	}
-	
-	public ExcelReporting getXlsObject(){
-		return excelLog;
-	}
-	
-	/**
-	 * Escribe el log obtenido en el fichero
-	 */
-	public void resumeValidation(){
-		SimpleDateFormat date = new SimpleDateFormat("dd-MM-yyyy");
-		checkDate(date.format(Calendar.getInstance().getTime()));
-//		if(cont == 0)
-//			cont++;
-//		else
-//			excelLog.rotateFile("28-06-2017", "27-06-2017");
 	}
 	
 	/**
@@ -124,19 +82,7 @@ public class LogControl {
 		String env = data.getEnvName().replace(" ", "");
 		file = System.getProperty("user.dir") + "/Logs/" + env;
 		new File(file).mkdirs();
-		file = file + "/" + env + ".log";
-	}
-	
-	/**
-	 * Define la ruta del fichero donde se guardara la actividad
-	 * en formato xslx
-	 */
-	private void setFileXlsPath(){
-		String env = data.getEnvName().replace(" ", "");
-//		env = env + "-";
-		xlsFile = System.getProperty("user.dir") + "/Logs/" + env;
-		new File(xlsFile).mkdirs();
-		xlsFile = xlsFile + "/" + env + "-" + currentDay + ".xls";
+		file = file + "/" + env + getWeek() + ".log";
 	}
 	
 	/**
@@ -157,19 +103,37 @@ public class LogControl {
 	private String getCurrentTime(){
 		Calendar cal = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy-HH:mm:ss");
-        SimpleDateFormat date = new SimpleDateFormat("dd-MM-yyyy");
-        checkDate(date.format(cal.getTime()));
-        currentDay = date.format(cal.getTime());
         return sdf.format(cal.getTime());
 	}
 	
 	/**
-	 * Comprueba si el dia de registro es igual al actual
+	 * Devuelve el mes y el año actual formateados
+	 * @return
 	 */
-	private void checkDate(String date){
-		if(!date.equals(currentDay)){
-			excelLog.rotateFile(date, currentDay);
+	private String getMonthYear(){
+		Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("-MM-yyyy");
+        
+		try {
+			return sdf.format(sdf.parse("-01-2018"));
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return sdf.format(cal.getTime());
 		}
-		currentDay = date;
+	}
+	
+	private String getWeek(){
+		Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("-'W'-ww-yyyy");
+        return sdf.format(cal.getTime());
+        
+//        try {
+//			return sdf.format(sdf.parse("-01-2018"));
+//		} catch (ParseException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//			return sdf.format(cal.getTime());
+//		}
 	}
 }

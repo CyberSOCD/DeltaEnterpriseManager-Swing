@@ -1,10 +1,6 @@
 package vista.ui.ProgressBar.Validation;
 
 import java.awt.Color;
-import java.awt.GradientPaint;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.io.File;
 
 import javax.swing.JProgressBar;

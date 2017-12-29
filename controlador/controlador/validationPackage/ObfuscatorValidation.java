@@ -11,8 +11,8 @@ import conexion.dbAccess.ObfuscatorQueries;
 import conexion.drivers.DriverDB;
 import controlador.common.UserConnectionData;
 import controlador.controlResult.ObfuscatorStatus;
-import controlador.dao.ObfuscatorDAO;
 import controlador.objects.obfuscator.ObfuscatorObject;
+import controlador.tools.ObfuscatorTools;
 import ofuscado.query.UpdateObject;
 import ofuscado.validation.GeneratorValidation;
 import vista.ui.ProgressBar.Validation.ProgressBarValidation;
@@ -113,7 +113,7 @@ public class ObfuscatorValidation extends Validation {
 //		MessageCenterDialog.showInformationDialog((Component)container, s);
 		driver.closeConnection();
 		
-		ObfuscatorDAO dao = new ObfuscatorDAO(data);
+		ObfuscatorTools dao = new ObfuscatorTools(data);
 		dao.writeFile(obfuscator);
 //		LogObfuscator log = new LogObfuscator(data);
 //		log.writeObfuscatorItem(obfuscator);

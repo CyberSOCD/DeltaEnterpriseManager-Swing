@@ -7,7 +7,6 @@ import controlador.builders.XmlBuilder;
 import controlador.common.ResultServlet;
 import controlador.common.UserConnectionData;
 import controlador.controlResult.EnvironmentStatus;
-import controlador.logger.ExcelReporting;
 import controlador.logger.LogControl;
 import controlador.xmlCheck.CheckXmlLogin;
 
@@ -27,17 +26,19 @@ public class EnvStatusValidation extends Validation{
 	private final String arqMethod = "getInitialServices";
 	private EnvironmentStatus status;
 	private LogControl Log;
-	private boolean first;
+	private String arqVersion = "";
+	private String serverVersion = "";
 
 	public EnvStatusValidation(UserConnectionData data){
 		this.data = data;
 		this.status = new EnvironmentStatus();
 		Log = new LogControl(data);
-		first = true;
 	}
 	
 	@Override
 	public void validate() throws Exception, MalformedURLException {
+		long totalElapsedTime = 0;
+		long totalPrevTime = System.nanoTime();
 		long elapsedTime = 0;
 		long prevTime = 0;
 		returnValue = null;
@@ -45,12 +46,12 @@ public class EnvStatusValidation extends Validation{
 		XmlBuilder builder = new XmlBuilder(data, loginMethod);
 		//Crea el objecto que va a trabajar sobre el servlet
 		EnvAccess env;
-		if(first){
-			env = new EnvAccess(data, builder.getXml().replace("deleteOtherSessions=\"true\"", "deleteOtherSessions=\"false\""),servletConection);
-			first = false;
-		}else{
-			env = new EnvAccess(data, builder.getXml(),servletConection);
-		}
+		//En caso de fallo de arquitectura y no existir sessiones previas
+//		if(first){
+//			env = new EnvAccess(data, builder.getXml().replace("deleteOtherSessions=\"true\"", "deleteOtherSessions=\"false\""),servletConection);
+//			first = false;
+//		}else
+		env = new EnvAccess(data, builder.getXml(),servletConection);
 		prevTime = System.nanoTime();
 		//Realiza el envio al servlet
 		returnValue = env.invokeServlet();
@@ -72,6 +73,8 @@ public class EnvStatusValidation extends Validation{
 					status.setCurrentStatus(EnvironmentStatus.CURRENT_STATUS_REV);
 					status.setErrorMessage("El tiempo de respuesta del servidor es lento");
 				}
+				//Tras analisis se lanza servlet contra BBDD
+				validateArqVersion();
 			}else{
 				status.setCurrentStatus(EnvironmentStatus.CURRENT_STATUS_KO);
 				status.setErrorMessage(check.getErrorMessage());
@@ -80,10 +83,13 @@ public class EnvStatusValidation extends Validation{
 			status.setCurrentStatus(EnvironmentStatus.CURRENT_STATUS_KO);
 			status.setErrorMessage(returnValue.getErrorMessage());
 		}
+		long totalNewTime = System.nanoTime();
+		totalElapsedTime = (totalNewTime - totalPrevTime)/1000000;
+		System.out.println("Para el entorno :::: " + data.getEnvKey() + " en milisegundos:::::: " + totalElapsedTime);
 	}
 	
 	public void activate(){
-		Log.activeLog();		
+		Log.activeLog();
 	}
 	
 	public String getServerVersion() throws Exception{
@@ -95,23 +101,20 @@ public class EnvStatusValidation extends Validation{
 			//En caso de excepcion se devuelve vacio
 			value = "";
 		}
+		serverVersion = value.replace("Versión desplegada ", "");
 		return value.replace("Versión desplegada ", "");
 	}
 	
-	public void stopValidation(){
-		Log.stopValidation();
-	}
-	
-	public ExcelReporting getXlsObject(){
-		return Log.getXlsObject();
-	}
-	
-	public void resumeValidation(){
-		Log.resumeValidation();
-	}
-	
 	public String getArqVersion(){
-		String value = "";
+		return arqVersion;
+	}
+
+	@Override
+	public EnvironmentStatus getCurrentStatus(){
+		return status;
+	}
+	
+	private void validateArqVersion(){
 		CheckXmlLogin check;
 		//Crea el objeto que recupera el xml a enviar
 		XmlBuilder builder = new XmlBuilder(data, arqMethod);
@@ -120,21 +123,17 @@ public class EnvStatusValidation extends Validation{
 			env.invokeServlet();
 			//Realiza el envio al servlet
 			check = new CheckXmlLogin(env.invokeServlet());
-			value = check.getArqVersion();
+			arqVersion= check.getArqVersion();
 		}catch(Exception e){
-			//En caso de excepcion se devuelve vacio
-			value = "";
+			//En caso de excepcion se marca la validacion como KO
+			status.setCurrentStatus(EnvironmentStatus.CURRENT_STATUS_KO);
+			status.setErrorMessage("BBDD inaccesible " + returnValue.getErrorMessage());
+			arqVersion = "";
 		}
-		return value;
-	}
-
-	@Override
-	public EnvironmentStatus getCurrentStatus(){
-		return status;
 	}
 
 	@Override
 	public void logActivity() {
-		Log.logActivity(returnValue, status);
+		Log.logActivity(returnValue, status, serverVersion, arqVersion);
 	}
 }

@@ -154,11 +154,9 @@ public class EnvironmentPanel extends JPanel{
 		
 		UserConnectionDataComparator comparator = new UserConnectionDataComparator(profile);
 		for(StatusPanel panel:envList){
-//			panel.stopValidation();
 			statusPanelContainer.remove(panel);
 		}
 		envList.clear();
-		
 		partialData = profile.getSystemProfileList(data, sistema);
 		Collections.sort(partialData,comparator);
 		//Mantiene unicamente los entornos que corresponden al perfil en cuestion
@@ -195,8 +193,7 @@ public class EnvironmentPanel extends JPanel{
 	public void resumeValidation(){
 		UpdateStatus.setText("Parar validación");
 		for(StatusPanel panel:envList){
-//			if(!panel.isTesting())
-				panel.resumeValidation();
+			panel.resumeValidation();
 		}
 		parent.resumeValidationInf();
 	}

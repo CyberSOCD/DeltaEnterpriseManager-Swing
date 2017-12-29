@@ -23,7 +23,6 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -31,15 +30,11 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 import controlador.common.UserConnectionData;
 import controlador.common.UserConnectionDataComparator;
-import controlador.dao.ObfuscatorDAO;
 import controlador.objects.obfuscator.ObfuscatorObject;
+import controlador.tools.ObfuscatorTools;
 import vista.ui.Dialog.FileSelectorDialog;
 import vista.ui.Dialog.MessageCenterDialog;
 import vista.ui.Dialog.ObfuscatorDetailsDialog;
@@ -532,7 +527,7 @@ public class ObfuscatorPanel extends JPanel {
 					 break;
 				 }
 			 }
-			 ObfuscatorDAO obf = new ObfuscatorDAO(data);
+			 ObfuscatorTools obf = new ObfuscatorTools(data);
 			 list.addAll(obf.getList());
 			 ofusModel.updateTableData(list);
 			 ofusModel.fireTableDataChanged();

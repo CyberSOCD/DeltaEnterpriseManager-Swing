@@ -7,6 +7,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.text.ParseException;
 import java.util.ArrayList;
 
 import javax.swing.DefaultComboBoxModel;
@@ -48,7 +49,7 @@ public class LoginFrame extends JFrame{
 	private ProfileControl profileControl;
 	private TipoSistema sistema;
 	
-	public LoginFrame(){
+	public LoginFrame() throws ParseException{
 		setTitle("Delta Enterprise Manager");
 		setSize(400, 180);
 		setLocationRelativeTo(null);
@@ -62,7 +63,7 @@ public class LoginFrame extends JFrame{
 		//que muestre tiempos incorrectos en la validacion
 		try {
 			WebClass c = new WebClass();
-			c.setURL("http://localhost", "");
+			c.setURL("http://127.0.0.1", "");
 		} catch (Exception e) {
 			
 		}

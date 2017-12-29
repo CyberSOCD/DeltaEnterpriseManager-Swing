@@ -106,7 +106,7 @@ public class OfflineStatus implements GenericStatus{
 		if(currentStatus == CURRENT_STATUS_OFF_ENDED_ABR_USR ||currentStatus ==CURRENT_STATUS_KO
 				|| currentStatus ==CURRENT_STATUS_OFF_ENDED_KO || currentStatus ==CURRENT_STATUS_OFF_ENDED_OK
 				|| currentStatus ==CURRENT_STATUS_OFF_ENDED_TIMEOUT || currentStatus ==CURRENT_STATUS_OFF_INTERRUPTED
-				|| currentStatus ==CURRENT_STATUS_REV || currentStatus ==CURRENT_STATUS_UNKOWN
+				|| currentStatus ==CURRENT_STATUS_REV || currentStatus ==CURRENT_STATUS_UNKNOWN
 				|| currentStatus == CURRENT_STATUS_OFF_QUEUED_KO){
 			timeQueued = 0;
 			return true;
@@ -155,7 +155,7 @@ public class OfflineStatus implements GenericStatus{
 			message= CURRENT_STATUS_OFF_QUEUED_KO_STRING;
 			break;
 		default:
-			message = GenericStatus.CURRENT_STATUS_UNKOWN_STRING;
+			message = GenericStatus.CURRENT_STATUS_UNKNOWN_STRING;
 			break;
 		}
 		return message;
@@ -245,7 +245,7 @@ public class OfflineStatus implements GenericStatus{
 			returnValue = CURRENT_STATUS_OFF_QUEUED_KO;
 			break;
 		default:
-			returnValue = GenericStatus.CURRENT_STATUS_UNKOWN;
+			returnValue = GenericStatus.CURRENT_STATUS_UNKNOWN;
 			break;
 		}
 		return returnValue;

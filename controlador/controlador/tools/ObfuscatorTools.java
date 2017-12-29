@@ -1,6 +1,5 @@
-package controlador.dao;
+package controlador.tools;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -12,7 +11,7 @@ import controlador.objects.obfuscator.ObfuscatorObject;
  * Carga los objetos recuperados del fichero correspondiente
  * 
  */
-public class ObfuscatorDAO {
+public class ObfuscatorTools {
 
 	private final static String FOLDER_NAME = "ofuscado";
 	private final static String FILE_EXTENSION = "_ofus_data.log";
@@ -37,7 +36,7 @@ public class ObfuscatorDAO {
 	private ArrayList<ObfuscatorObject> list;
 	private String fileName;
 
-	public ObfuscatorDAO(UserConnectionData data) {
+	public ObfuscatorTools(UserConnectionData data) {
 		fileName = data.getEnvKey() + FILE_EXTENSION;
 		list = new ArrayList<ObfuscatorObject>();
 	}
