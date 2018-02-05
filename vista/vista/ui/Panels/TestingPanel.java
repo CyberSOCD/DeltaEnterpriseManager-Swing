@@ -12,6 +12,7 @@ import vista.ui.Profiles.ProfileControl.TipoSistema;
 import vista.ui.Tabs.GenericControlTab;
 import vista.ui.Tabs.HealthValidationTab;
 import vista.ui.Tabs.ObfuscatorValidationTab;
+import vista.ui.Tabs.ReportingControlTab;
 
 @SuppressWarnings("serial")
 public class TestingPanel extends JPanel {
@@ -20,8 +21,10 @@ public class TestingPanel extends JPanel {
 	private JTabbedPane genericPanel;
 	private GenericControlTab validacionEntornos;
 	private GenericControlTab validacionOfuscado;
+	private GenericControlTab generacionInformes;
 	private static final int validationIndexTab = 0;
 	private static final int ofuscadoIndexTab = 1;
+	private static final int informeIndexTab = 2;
 	private TipoSistema sistema;
 
 	/**
@@ -36,6 +39,7 @@ public class TestingPanel extends JPanel {
 		sistema = tipo;
 		validacionEntornos = new HealthValidationTab(ListData,sistema,this.profile);
 		validacionOfuscado = new ObfuscatorValidationTab(ListData, sistema, profile);
+		generacionInformes = new ReportingControlTab(ListData, sistema, profile);
 		initialize();
 	}
 	
@@ -48,6 +52,11 @@ public class TestingPanel extends JPanel {
 		genericPanel.setVisible(true);
 		genericPanel.setSelectedIndex(ofuscadoIndexTab);
 	}
+	
+	public void selectReporting(){
+		genericPanel.setVisible(true);
+		genericPanel.setSelectedIndex(informeIndexTab);
+	}
 
 	/**
 	 * Iniciliza todos los componentes del Componente
@@ -56,8 +65,10 @@ public class TestingPanel extends JPanel {
 
 		genericPanel = new JTabbedPane();
 		genericPanel.addTab("Validación entornos", validacionEntornos);
-		if(profile.isAdmin())
+		if(profile.isAdmin()){
 			genericPanel.addTab("Validación Ofuscado", validacionOfuscado);
+			genericPanel.addTab("Generacion Informes", generacionInformes);
+		}
 		add(genericPanel);
 		
 		genericPanel.setVisible(false);

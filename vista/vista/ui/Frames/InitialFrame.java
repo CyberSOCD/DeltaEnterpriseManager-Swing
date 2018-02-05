@@ -35,6 +35,7 @@ public class InitialFrame extends JFrame {
 	private JMenu subMenuEntornoEstado;
 	private JMenuItem exitMenuItem;
 	private JMenuItem validacionMenuItem;
+	private JMenuItem informesMenuItem;
 	private JMenuItem ofuscadoMenuItem;
 	private JMenuItem stopValidationMenuItem;
 	private JMenuItem resumeValidationMenuItem;
@@ -109,6 +110,13 @@ public class InitialFrame extends JFrame {
 			}
 		});
 		
+		informesMenuItem = new JMenuItem(new AbstractAction("Generacion de informes") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				testPanel.selectReporting();
+			}
+		}); 
+		
 		ofuscadoMenuItem = new JMenuItem(new AbstractAction("Validación ofuscado") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -149,8 +157,10 @@ public class InitialFrame extends JFrame {
 		
 		//-------------------------------------------------------------
 		menuAcciones.add(validacionMenuItem);
-		if(prof.isAdmin())
+		if(prof.isAdmin()){
 			menuAcciones.add(ofuscadoMenuItem);
+			menuAcciones.add(informesMenuItem);
+		}
 		
 		menuEntorno.add(subMenuEntornoEstado);
 		subMenuEntornoEstado.add(stopValidationMenuItem);

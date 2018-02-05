@@ -61,12 +61,23 @@ public class LoginFrame extends JFrame{
 		loginPanel.loading();
 		//Se fuerza la carga inicial de un WebClass para evitar 
 		//que muestre tiempos incorrectos en la validacion
-		try {
-			WebClass c = new WebClass();
-			c.setURL("http://127.0.0.1", "");
-		} catch (Exception e) {
-			
-		}
+		long elapsedTime = 0;
+		long prevTime = 0;
+		WebClass c = new WebClass();
+		do{
+			elapsedTime = 0;
+			prevTime = System.nanoTime();
+			try {
+//				c = new WebClass();
+				c.setURL("http://127.0.0.1", "");
+			} catch (Exception e) {
+				
+			}finally{
+				long newTime = System.nanoTime();
+				elapsedTime = (newTime - prevTime)/1000000;
+				System.out.println("Tiempo de carga:::: " + elapsedTime);
+			}
+		}while(elapsedTime>1500);
 		//Por defecto sistema Minorista
 		sistema = TipoSistema.MINORISTA;
 		loginPanel.resume();

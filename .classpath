@@ -6,9 +6,10 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="src" path="templates"/>
 	<classpathentry kind="src" path="controlador"/>
 	<classpathentry kind="src" path="conexiones"/>
-	<classpathentry including="**/*.java" kind="src" path="resources"/>
+	<classpathentry excluding="imgs/" including="**/*.java" kind="src" path="resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/htmlUnitLibrary"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/poiLibrary"/>
@@ -25,5 +26,7 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="C:/Productos/oracle_jdbc/ojdbc6.jar"/>
 	<classpathentry kind="lib" path="/Ofuscado/target/Ofuscado-0.0.1-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="C:/Productos/poi-3.15/ooxml-lib/curvesapi-1.04.jar"/>
+	<classpathentry kind="lib" path="C:/Productos/poi-3.15/ooxml-lib/xmlbeans-2.6.0.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

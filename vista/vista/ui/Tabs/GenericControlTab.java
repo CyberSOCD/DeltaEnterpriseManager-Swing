@@ -103,6 +103,10 @@ public abstract class GenericControlTab extends JPanel {
 	
 	public abstract void loadComponent();
 	
+	/**
+	 * Controla el comportamiento al cambiar entre Mayoristas y Minoristas
+	 * @param panel
+	 */
 	protected abstract void changeSelected(JPanel panel);
 	
 }

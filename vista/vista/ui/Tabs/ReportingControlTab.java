@@ -7,48 +7,59 @@ import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
-import vista.ui.Dialog.MessageCenterDialog;
-import vista.ui.Panels.ObfuscatorPanel;
+import controlador.common.UserConnectionData;
+import vista.ui.Panels.ReportingPanel;
 import vista.ui.Profiles.ProfileControl;
 import vista.ui.Profiles.ProfileControl.TipoSistema;
-import controlador.common.UserConnectionData;
 
 @SuppressWarnings("serial")
-public class ObfuscatorValidationTab extends GenericControlTab {
-	
-	private ProfileControl profile;
-	private ArrayList<UserConnectionData> fullListData;
-	//JPanels
-	private JPanel mainPanel;
-	private ObfuscatorPanel validationsPanel;
-	private JPanel buttonsPanel;
-	private JPanel panelActive;
+public class ReportingControlTab extends GenericControlTab{
+	private ArrayList<UserConnectionData> data;
 	private TipoSistema sistema;
+	private ProfileControl profile;
+	private JPanel mainPanel;
+	private JPanel panelActive;
+	private JPanel buttonsPanel;
+	private ReportingPanel reportingPanel;
 
-	public ObfuscatorValidationTab(ArrayList<UserConnectionData> ListData,
-			TipoSistema tipo, ProfileControl profile) {
-		super(tipo,profile);
+	public ReportingControlTab(ArrayList<UserConnectionData> ListData, TipoSistema tipo, ProfileControl profile) {
+		super(tipo, profile);
+		data = ListData;
 		sistema = tipo;
 		this.profile = profile;
-		this.fullListData = ListData;
 		initialize();
-		loadComponent();
 	}
 
 	@Override
 	public void loadComponent() {
 		
 	}
+
+	@Override
+	protected void changeSelected(JPanel panel) {
+		if(!panel.equals(panelActive)){
+			panelActive = panel;
+			if(panelActive.equals(panelMayorista)){
+				unSelected(panelMinorista);
+				sistema = TipoSistema.MAYORISTA;
+			}
+			else{
+				unSelected(panelMayorista);
+				sistema = TipoSistema.MINORISTA;
+			}
+			setSelected(panelActive);
+			reportingPanel.changeSystem(sistema);
+			validate();
+			repaint();
+		}
+	}
 	
-	/**
-	 * Inicializa los componentes del panel
-	 */
 	private void initialize(){
 		mainPanel = new JPanel();
 		mainPanel.setLayout(new BorderLayout(5, 5));
 		setLayout(new GridLayout(1,1));
 		add(mainPanel);
-		validationsPanel = new ObfuscatorPanel(fullListData, profile, sistema);
+		reportingPanel = new ReportingPanel(data, profile, sistema);
 		panelActive = panelMinorista;
 		buttonsPanel = new JPanel();
 		
@@ -67,7 +78,7 @@ public class ObfuscatorValidationTab extends GenericControlTab {
 		gridBag.gridwidth = 3;
 		gridBag.gridx = 0;
 		gridBag.gridy = 1;
-		mainPanel.add(validationsPanel, BorderLayout.WEST);
+		mainPanel.add(reportingPanel, BorderLayout.WEST);
 		gridBag.fill = GridBagConstraints.HORIZONTAL;
 		gridBag.ipady = 70;
 		gridBag.ipadx = 70;
@@ -77,24 +88,5 @@ public class ObfuscatorValidationTab extends GenericControlTab {
 		gridBag.gridy = 2;
 		mainPanel.add(buttonsPanel, BorderLayout.SOUTH);
 	}
-	
-	@Override
-	protected void changeSelected(JPanel panel){
-		if(validationsPanel.isValidating()){
-			MessageCenterDialog.showWarningDialog(this, "Se está validando un entorno, no se puede cambiar de sistema");
-			return;
-		}
-		if (!panel.equals(panelActive)) {
-			panelActive = panel;
-			if (panelActive.equals(panelMayorista)) {
-				unSelected(panelMinorista);
-				sistema = TipoSistema.MAYORISTA;
-			} else {
-				unSelected(panelMayorista);
-				sistema = TipoSistema.MINORISTA;
-			}
-			setSelected(panelActive);
-			validationsPanel.changeSystem(sistema);
-		}
-	}
+
 }

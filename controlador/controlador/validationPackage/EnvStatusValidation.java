@@ -37,8 +37,6 @@ public class EnvStatusValidation extends Validation{
 	
 	@Override
 	public void validate() throws Exception, MalformedURLException {
-		long totalElapsedTime = 0;
-		long totalPrevTime = System.nanoTime();
 		long elapsedTime = 0;
 		long prevTime = 0;
 		returnValue = null;
@@ -83,9 +81,6 @@ public class EnvStatusValidation extends Validation{
 			status.setCurrentStatus(EnvironmentStatus.CURRENT_STATUS_KO);
 			status.setErrorMessage(returnValue.getErrorMessage());
 		}
-		long totalNewTime = System.nanoTime();
-		totalElapsedTime = (totalNewTime - totalPrevTime)/1000000;
-		System.out.println("Para el entorno :::: " + data.getEnvKey() + " en milisegundos:::::: " + totalElapsedTime);
 	}
 	
 	public void activate(){

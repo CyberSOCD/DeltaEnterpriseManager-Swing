@@ -2,6 +2,7 @@ package controlador.tools;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import controlador.controlResult.GenericStatus.CurrentStatusValue;
 import controlador.logger.LogLineObject;
@@ -24,10 +25,8 @@ public class LogTools {
 	 * 
 	 * @param line
 	 * @return lineObject
-	 * @throws ParseException
 	 */
-	public static LogLineObject deserializedLogLine(String line)
-			throws ParseException {
+	public static LogLineObject deserializedLogLine(String line){
 		LogLineObject lineObject = new LogLineObject();
 		boolean errorLine = false;
 		int timeValue;
@@ -43,8 +42,9 @@ public class LogTools {
 			timeString = line.split(connector)[simpleTimePosition];
 		}
 		// Tratamiento de fecha
-		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy-HH:mm:ss");
-		lineObject.setValidationDate(sdf.parse(dateString));
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTimeInMillis(Long.valueOf(dateString));
+		lineObject.setValidationDate(calendar.getTime());
 		// Tratamiento status
 		lineObject.setStatus(Integer.valueOf(statusString));
 		if (errorLine)

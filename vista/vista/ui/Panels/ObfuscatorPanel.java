@@ -13,12 +13,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 
 import javax.swing.AbstractButton;
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -32,7 +30,6 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 
 import controlador.common.UserConnectionData;
-import controlador.common.UserConnectionDataComparator;
 import controlador.objects.obfuscator.ObfuscatorObject;
 import controlador.tools.ObfuscatorTools;
 import vista.ui.Dialog.FileSelectorDialog;
@@ -71,8 +68,7 @@ public class ObfuscatorPanel extends JPanel {
 	private JTextField scriptSystemText;
 	private JTextField scriptVersionText;
 	
-	private JPanel environmentPanel;
-	private ArrayList<JRadioButton> rButtonsList;
+	private EnvironmentRButtonsPanel envPanel;
 	private JTable ofusTable;
 	private TableModelObfuscator ofusModel;
 	private JScrollPane scrollPanel;
@@ -98,8 +94,6 @@ public class ObfuscatorPanel extends JPanel {
 	private static final String validateButtonValue = "Validar Ofuscado";
 	private static final String detailsButtonValue = "Detalles";
 	
-	private static final String borderName = "Entornos Ofuscado";
-	
 	private static final String scriptNameLabelValue = "Nombre de script";
 	private static final String scriptSystemLabelValue = "Sistema";
 	private static final String scriptVersionLabelValue = "Version del script";
@@ -119,7 +113,6 @@ public class ObfuscatorPanel extends JPanel {
 		data = ListData;
 		sistema = tipo;
 		relation = new HashMap<UserConnectionData, JRadioButton>();
-		rButtonsList = new ArrayList<JRadioButton>();
 		this.profile = profile;
 		loadData();
 		initialize();
@@ -132,33 +125,18 @@ public class ObfuscatorPanel extends JPanel {
 	public void changeSystem(TipoSistema tipo){
 		sistema = tipo;
 		//Se elimina la lista de botonoes del grupo
-		relation.clear();
-		btnGroup = new ButtonGroup();
 		filterData = profile.getSystemProfileList(data, sistema);
-		environmentPanel.removeAll();
-		UserConnectionDataComparator comparator = new UserConnectionDataComparator(profile);
-		Collections.sort(filterData,comparator);
-		JPanel aux = new JPanel();
-		for(UserConnectionData usr:filterData){
-			JRadioButton rButton = new JRadioButton(usr.getEnvName());
-			rButton.setAlignmentX(LEFT_ALIGNMENT);
-			rButton.setSelected(false);
-			relation.put(usr, rButton);
-			btnGroup.add(rButton);
-			aux = new JPanel();
-			aux.setSize(new Dimension(100,5));
-			aux.setAlignmentX(LEFT_ALIGNMENT);
-			environmentPanel.add(aux);
-			environmentPanel.add(rButton);
-			rButton.addItemListener(new ItemListener() {
+		envPanel.changeSystem(filterData);
+		for(Enumeration<AbstractButton> e = btnGroup.getElements();e.hasMoreElements();){
+			e.nextElement().addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(ItemEvent e) {
 					if (e.getStateChange() == ItemEvent.SELECTED) {
+						//Informa a paneles inferiores del cambio
 						processChange((JRadioButton)e.getSource());
 				    }
 				}
 			});
-			rButtonsList.add(rButton);
 		}
 		validate();
 		repaint();
@@ -180,64 +158,30 @@ public class ObfuscatorPanel extends JPanel {
 		 */
 		
 		mainPanel = new JPanel();
-//		mainPanel.setLayout(new GridLayout(1,2));
 		mainPanel.setLayout(new BoxLayout(mainPanel,BoxLayout.X_AXIS));
-//		mainPanel.setBorder(BorderFactory.createTitledBorder("Main Panel"));
-		
-		/***************************************************************************
-		 * Se inicializa el panel de seleccion de entorno a validar
-		 */
-		
-		environmentPanel = new JPanel();
-		environmentPanel.setLayout(new BoxLayout(environmentPanel,BoxLayout.Y_AXIS));
-		environmentPanel.setAlignmentY(TOP_ALIGNMENT);
-//		environmentPanel.setLayout(new GridLayout(data.size()+7, 1,5,20));
-		environmentPanel.setBorder(BorderFactory.createTitledBorder(borderName));
 		
 		/***************************************************************************
 		 * Se cargan los componentes internos para la seleccion de entorno
 		 */
-		
 		btnGroup = new ButtonGroup();
-		//Se crea la opcion por defecto sin seleccionar ningun entorno
-//		rButtonDefault = new JRadioButton(defaultValue);
-//		rButtonDefault.setSelected(true);
-//		btnGroup.add(rButtonDefault);
-		JPanel aux = new JPanel();
-		aux.setSize(new Dimension(100,10));
-		aux.setAlignmentX(LEFT_ALIGNMENT);
-		environmentPanel.add(aux);
-//		rButtonDefault.setAlignmentX(LEFT_ALIGNMENT);
-//		environmentPanel.add(rButtonDefault);
-		UserConnectionDataComparator comparator = new UserConnectionDataComparator(profile);
-		Collections.sort(filterData,comparator);
-		for(UserConnectionData usr:filterData){
-			if(profile.checkEnvironment(usr)){
-				JRadioButton rButton = new JRadioButton(usr.getEnvName());
-				rButton.setAlignmentX(LEFT_ALIGNMENT);
-				rButton.setSelected(false);
-				relation.put(usr, rButton);
-				btnGroup.add(rButton);
-				aux = new JPanel();
-				aux.setSize(new Dimension(100,5));
-				aux.setAlignmentX(LEFT_ALIGNMENT);
-				environmentPanel.add(aux);
-				environmentPanel.add(rButton);
-				rButton.addItemListener(new ItemListener() {
-					@Override
-					public void itemStateChanged(ItemEvent e) {
-						if (e.getStateChange() == ItemEvent.SELECTED) {
-							processChange((JRadioButton)e.getSource());
-					    }
-					}
-				});
-				rButtonsList.add(rButton);
-			}
-			aux = new JPanel();
-			aux.setSize(new Dimension(100,10));
-			aux.setAlignmentX(LEFT_ALIGNMENT);
-			environmentPanel.add(aux);
+		envPanel = new EnvironmentRButtonsPanel(filterData, profile);
+		envPanel.setButtonsGroup(btnGroup);
+		
+		filterData = profile.getSystemProfileList(data, sistema);
+		envPanel.changeSystem(filterData);
+		for(Enumeration<AbstractButton> e = btnGroup.getElements();e.hasMoreElements();){
+			e.nextElement().addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						//Informa a paneles inferiores del cambio
+						processChange((JRadioButton)e.getSource());
+				    }
+				}
+			});
 		}
+		
+		//Se crea la opcion por defecto sin seleccionar ningun entorno
 		
 		/***************************************************************************
 		 * Se inicializa el panel para la validacion contra la BBDD y 
@@ -247,7 +191,6 @@ public class ObfuscatorPanel extends JPanel {
 		validationPanel = new JPanel();
 		validationPanel.setAlignmentY(TOP_ALIGNMENT);
 		validationPanel.setLayout(new GridLayout(2,1));
-		validationPanel.setBorder(BorderFactory.createTitledBorder("ValidationPanel"));
 		
 		/***************************************************************************
 		 * Se inicializa el panel para la validacion contra la BBDD
@@ -255,7 +198,6 @@ public class ObfuscatorPanel extends JPanel {
 		 */
 		
 		obfuscatorValidationPanel = new JPanel();
-//		obfuscatorValidationPanel.setBorder(BorderFactory.createTitledBorder("BD"));
 		obfuscatorValidationPanel.setLayout(new BoxLayout(obfuscatorValidationPanel,BoxLayout.Y_AXIS));
 		
 		/***************************************************************************
@@ -267,23 +209,17 @@ public class ObfuscatorPanel extends JPanel {
 		 * Panel donde se muestran datos sobre el script de ofuscado cargado
 		 */
 		filePanel = new JPanel();
-//		filePanel.setLayout(new GridLayout(1,1));
 		filePanel.setLayout(new BoxLayout(filePanel,BoxLayout.Y_AXIS));
-//		filePanel.setBorder(BorderFactory.createTitledBorder("FilePanel"));
 		
 		scriptDataPanel = new JPanel();
-//		scriptDataPanel.setLayout(new GridLayout(1,2));
 		scriptDataPanel.setLayout(new BoxLayout(scriptDataPanel,BoxLayout.X_AXIS));
 		scriptDataPanel.setAlignmentX(LEFT_ALIGNMENT);
-//		scriptDataPanel.setBorder(BorderFactory.createTitledBorder("ScriptsDataPanel"));
 		
 		scriptDataLabelPanel = new JPanel();
-//		scriptDataLabelPanel.setLayout(new GridLayout(3,1,5,5));
 		
 		scriptDataLabelPanel.setLayout(new BoxLayout(scriptDataLabelPanel, BoxLayout.PAGE_AXIS));
 		
 		
-//		scriptDataLabelPanel.setBorder(BorderFactory.createTitledBorder("LabelsPanel"));
 		scriptDataLabelPanel.setAlignmentY(TOP_ALIGNMENT);
 		scriptNameLabel = new JLabel(scriptNameLabelValue);
 		scriptSystemLabel = new JLabel(scriptSystemLabelValue);
@@ -299,9 +235,7 @@ public class ObfuscatorPanel extends JPanel {
 		scriptDataLabelPanel.add(progressVersionLabel);
 		
 		scriptDataTextPanel = new JPanel();
-//		scriptDataTextPanel.setLayout(new GridLayout(3,1,5,5));
 		scriptDataTextPanel.setLayout(new BoxLayout(scriptDataTextPanel, BoxLayout.PAGE_AXIS));
-//		scriptDataTextPanel.setBorder(BorderFactory.createTitledBorder("TextsPanel"));
 		scriptDataTextPanel.setAlignmentY(TOP_ALIGNMENT);
 		scriptNameText = new JTextField(scriptNameTextDefaultvalue);
 		scriptNameText.setMaximumSize(new Dimension(
@@ -320,7 +254,6 @@ public class ObfuscatorPanel extends JPanel {
 		scriptVersionText.setEditable(false);
 		
 		progressBar = new ObfuscatorProgressBar();
-//		progressBar.setSize(200, 30);
 		progressBar.setMaximumSize(scriptVersionText.getMaximumSize());
 		progressBar.setVisible(false);
 		
@@ -341,7 +274,6 @@ public class ObfuscatorPanel extends JPanel {
 		 * Botones que controlan carga de script de ofuscado y validacion contra BBDD
 		 */
 		buttonsBDPanel = new JPanel();
-//		buttonsBDPanel.setBorder(BorderFactory.createTitledBorder("ButtonsPanel"));
 		buttonsBDPanel.setAlignmentX(LEFT_ALIGNMENT);
 		
 		buttonsBDPanel.setLayout(new BoxLayout(buttonsBDPanel,BoxLayout.X_AXIS));
@@ -462,7 +394,7 @@ public class ObfuscatorPanel extends JPanel {
 		 * validaciones de ofuscado
 		 */
 		tableOfusPanel = new JPanel();
-		tableOfusPanel.setBorder(BorderFactory.createTitledBorder("Table Panel"));
+//		tableOfusPanel.setBorder(BorderFactory.createTitledBorder("Table Panel"));
 		tableOfusPanel.setLayout(new GridLayout(1,1));
 		
 		ofusModel = new TableModelObfuscator(list);
@@ -498,7 +430,7 @@ public class ObfuscatorPanel extends JPanel {
 		validationPanel.add(obfuscatorValidationPanel);
 		validationPanel.add(tableOfusPanel);
 		
-		mainPanel.add(environmentPanel);
+		mainPanel.add(envPanel);
 		mainPanel.add(validationPanel);
 		
 		add(mainPanel);
@@ -516,6 +448,7 @@ public class ObfuscatorPanel extends JPanel {
 	 * @param rButton
 	 */
 	private void processChange(JRadioButton rButton){
+		relation = envPanel.getButtonRelation();
 		 if(rButton.isSelected()){
 			 //Limpia la lista
 			 list.clear();
